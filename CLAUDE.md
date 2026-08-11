@@ -34,7 +34,47 @@ and see `spec/README.md` for how the checks in this repo relate to it.
   you the file, the line, or the contract. Treat a red check as authoritative
   --- the page is wrong until the check is green, not until you decide it should
   be.
-- Commit when the checks pass. Never commit a red state.
+- Commit when every remaining failure is known and expected, not only when
+  everything is green. A spec test failing because its requirement isn't
+  built yet is expected --- commit alongside it. A newly broken or
+  unexplained failure is not: find the cause before committing. Never weaken
+  or delete a test to force it green; fix a test only if it misread the
+  spec, never to make it convenient. And don't call a change complete
+  because nothing new turned red --- verify it first.
+
+## Working loop
+
+- **Ground decisions, don't assume them.** Before the first `PLAN.md`, and
+  whenever a meaningful new design, UX, content, scope, or architectural
+  decision arises, ground it in the brief/spec, code, the existing
+  artefact, or rendered behaviour --- never in assumption. This clarifies
+  the published course material; it doesn't reinterpret or water it down.
+  If it seems wrong, that's a question for the teaching team.
+- **Decide before building.** When a change involves a genuine design, UX,
+  content, scope, or architectural choice, surface concrete options and get
+  a decision before substantial implementation, not a finished build to
+  react to. Mechanical or already-approved work proceeds directly.
+- **Prove it on a slice.** Once a direction is decided, implement the
+  smallest meaningful example of it first, render it, and get it reviewed
+  before rolling the pattern out to the rest of the site --- a check that
+  the chosen direction holds up in practice, not another design decision.
+- **Two-speed verification.** Before a decision or a slice review, run
+  only enough sanity verification to make the result safe and meaningful to
+  judge. Run the full relevant verification --- checks, evidence, both
+  viewports --- at meaningful completion checkpoints, including final
+  completion, not after every step along the way.
+- **`PLAN.md` holds current decisions, not history.** Keep only the
+  durable decisions a fresh session needs to continue correctly. When a
+  decision is superseded, replace or summarise it in place --- don't append
+  another historical layer. Implementation history belongs in Git and,
+  where meaningful to the process, `PROCESS.md`.
+- **`TASKS.md` is a small rolling working set.** Keep the current task
+  (bounded, with a concise observable completion condition), the next few
+  meaningful tasks, and any open blockers or unresolved decisions. Once a
+  task is committed, collapse it to one line pointing at that commit ---
+  drop the implementation notes, reasoning, test output, viewport
+  measurements, and verification logs; that detail lives in the commit and
+  `PROCESS.md`.
 
 ## The checks (your sensors)
 
