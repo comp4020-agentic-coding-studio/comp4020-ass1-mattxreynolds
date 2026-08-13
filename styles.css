@@ -64,7 +64,7 @@ nav a {
 
 .track {
   position: relative;
-  height: 1650vh;
+  height: 1800vh;
 }
 
 .stage {
@@ -105,6 +105,19 @@ nav a {
     rgb(6 6 12 / 92%) 55%,
     rgb(6 6 12 / 60%) 78%,
     rgb(6 6 12 / 0%) 100%
+  );
+}
+
+/* Recombination-era plasma glowed white-hot, not clinical white — a
+   ~3000K blackbody peaking in visible white/orange, not the cold
+   microwave it's redshifted to today. */
+.veil-bright {
+  background: radial-gradient(
+    circle,
+    rgb(255 253 246 / 100%) 0%,
+    rgb(255 243 214 / 96%) 45%,
+    rgb(255 208 140 / 70%) 75%,
+    rgb(255 208 140 / 0%) 100%
   );
 }
 

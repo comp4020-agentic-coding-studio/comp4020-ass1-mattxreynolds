@@ -5,19 +5,13 @@ see `CLAUDE.md`.
 
 ## Current
 
-- [ ] Final CMB polish and the `.payoff` closing text — build order stage 4
-  in `PLAN.md`, the last waypoint. Reuse the veil mechanism from the fog
-  (see Done below), inverted: bright, not dark. Budget real time here —
-  the CMB is the piece's actual payoff, not "just another waypoint."
-  `.payoff` in `index.html` is currently a placeholder sentence scoped
-  only to what's built so far.
+- [ ] Resize-mid-scroll check (not yet done — only fixed-viewport checks so
+  far).
 
 ## Next
 
-- [ ] Resize-mid-scroll check (not yet done — only fixed-viewport checks so
-  far).
 - [ ] `pnpm check:evidence` + linkinator, all green (full `pnpm check` is
-  already green through waypoint 7).
+  already green through the CMB, all 12 waypoints).
 - [ ] `PROCESS.md` (400–600 words, 3–4 cited moments) and
   `reflections/assignment-1.md` (150–300 words).
 - [ ] `/ship`, then verify the live URL at both viewports.
@@ -74,6 +68,23 @@ see `CLAUDE.md`.
   Cluster) re-checked and still read correctly after the retime.
   `pnpm check` green (typecheck, build, lint, 21 tests — updated
   `spec/depth-as-time.test.ts`'s thresholds again).
+- [x] CMB waypoint (12th and last) — build order stage 4 done. Grammar
+  decided with Matt before building, via `AskUserQuestion`, not assumed:
+  (1) the bright wall punches through the dark fog rather than the fog
+  receding first — the fog veil now holds at its max forever, and the CMB's
+  bright veil is a second layer appended after it that paints on top,
+  reading as "the wall was what the fog was hiding," not a passage through
+  to somewhere lighter; (2) after its peak the bright veil recedes back to
+  0 before the track ends, so `.payoff` lands on the site's normal dark
+  background instead of a hard white cut. Same `LAYER_MARKUP`/`LAYER_FRAMES`
+  mechanism as the fog, just a warm-white gradient (grounded in the
+  ~3000K blackbody colour of recombination-era plasma, not a clinical
+  white) instead of dark. Progress schedule rescaled again for 12 stops
+  (track height 1650vh → 1800vh; every earlier threshold compressed by
+  11/12 to make room, same relative pacing). Wrote the real `.payoff`
+  closing text (was a placeholder scoped to the old 2-waypoint slice).
+  `pnpm check` green; `spec/depth-as-time.test.ts` thresholds updated again
+  plus a new assertion for the `cmb` waypoint.
 
 ## Open blockers / unresolved decisions
 

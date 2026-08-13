@@ -52,6 +52,17 @@ instead of a small centred SVG, and its frames hold scale/position constant
 and ramp only opacity. Same data shape, different visual content; simpler
 than the two-list split this section originally anticipated.
 
+**Fog → CMB decision (confirmed with Matt before building):** the dark fog
+veil ramps up then holds at its maximum forever — it never recedes, because
+the thesis is that there's nothing to pass *through*, only a wall to reach.
+The CMB's bright veil is a second, separate layer appended after the fog in
+`WAYPOINTS` order, so it paints on top of the held darkness: the wall reveals
+itself as what the fog was hiding all along, not a passage to somewhere
+lighter beyond it. After its own peak (near-total whiteout), the bright veil
+recedes back to 0 before the track ends, so `.payoff` lands on the site's
+ordinary dark background — a deliberate return to calm after the gut-punch,
+not a hard white-to-dark cut.
+
 A fixed HUD overlay shows discrete state — name, distance, lookback label,
 anchor — for whichever waypoint's `from` progress-threshold the current
 `progress` has most recently crossed. That discrete mapping (progress →
@@ -122,7 +133,9 @@ Sources checked this session: [M87/Virgo distance](https://www.britannica.com/pl
 3. The cosmological jump (8–11) — where anchors start failing, which is the
    point.
 4. Final polish on the CMB waypoint — the payoff has to land, budget real
-   time for it rather than treating it as "just another waypoint."
+   time for it rather than treating it as "just another waypoint." Done —
+   grammar decided with Matt before building (see Core interaction above),
+   built, and screenshotted at both viewports.
 
 If time runs short, the piece stops wherever the build order has reached —
 truncating the tail (more mid-distance galaxies) rather than the argument

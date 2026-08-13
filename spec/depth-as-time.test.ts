@@ -38,9 +38,10 @@ describe("depth-as-time: zoom engine", () => {
     const staged = WAYPOINTS.filter((w) => w.from !== undefined);
     expect(currentWaypoint(0, staged).id).toBe("moon");
     expect(currentWaypoint(0.05, staged).id).toBe("moon");
-    expect(currentWaypoint(0.06, staged).id).toBe("sun");
-    expect(currentWaypoint(0.54, staged).id).toBe("virgo-cluster");
-    expect(currentWaypoint(0.92, staged).id).toBe("reionization-fog");
-    expect(currentWaypoint(1, staged).id).toBe("reionization-fog");
+    expect(currentWaypoint(0.055, staged).id).toBe("sun");
+    expect(currentWaypoint(0.495, staged).id).toBe("virgo-cluster");
+    expect(currentWaypoint(0.843, staged).id).toBe("reionization-fog");
+    expect(currentWaypoint(0.942, staged).id).toBe("cmb");
+    expect(currentWaypoint(1, staged).id).toBe("cmb");
   });
 });

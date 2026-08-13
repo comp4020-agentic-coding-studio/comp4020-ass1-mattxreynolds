@@ -33,7 +33,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "8.3 minutes ago",
     lookbackYears: (8.3 * 60) / (365.25 * 24 * 3600),
     anchor: "Long enough to boil an egg.",
-    from: 0.06,
+    from: 0.055,
   },
   {
     id: "proxima-centauri",
@@ -42,7 +42,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "4.2 years ago",
     lookbackYears: 4.2,
     anchor: "About as long as a university degree.",
-    from: 0.15,
+    from: 0.138,
   },
   {
     id: "vega",
@@ -51,7 +51,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "25 years ago",
     lookbackYears: 25,
     anchor: "About a generation ago.",
-    from: 0.24,
+    from: 0.22,
   },
   {
     id: "sagittarius-a",
@@ -60,7 +60,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "26,000 years ago",
     lookbackYears: 26_000,
     anchor: "The last Ice Age. Woolly mammoths were still common.",
-    from: 0.34,
+    from: 0.312,
   },
   {
     id: "andromeda",
@@ -69,7 +69,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "2.5 million years ago",
     lookbackYears: 2.5e6,
     anchor: "Around when our own genus, Homo, first appears in the fossil record.",
-    from: 0.44,
+    from: 0.403,
   },
   {
     id: "virgo-cluster",
@@ -78,7 +78,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "54 million years ago",
     lookbackYears: 54e6,
     anchor: "Not long after the dinosaurs died out. Early primates were spreading.",
-    from: 0.54,
+    from: 0.495,
   },
   {
     id: "3c273",
@@ -87,7 +87,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "2.4 billion years ago",
     lookbackYears: 2.4e9,
     anchor: "Around when Earth's atmosphere first gained oxygen.",
-    from: 0.64,
+    from: 0.587,
   },
   {
     id: "gn-z11",
@@ -96,7 +96,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "13.4 billion years ago",
     lookbackYears: 13.4e9,
     anchor: "Before Earth existed at all.",
-    from: 0.73,
+    from: 0.669,
   },
   {
     id: "jades-gs-z14-0",
@@ -105,7 +105,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "13.5 billion years ago",
     lookbackYears: 13.5e9,
     anchor: "About 300 million years after the Big Bang — one of the first galaxies to ever form.",
-    from: 0.82,
+    from: 0.752,
   },
   {
     id: "reionization-fog",
@@ -114,7 +114,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "~13.6 billion years ago",
     lookbackYears: 13.6e9,
     anchor: "Not a limit of telescopes. The universe itself was still too foggy to see through.",
-    from: 0.92,
+    from: 0.843,
   },
   {
     id: "cmb",
@@ -123,5 +123,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "13.8 billion years ago",
     lookbackYears: 13.8e9,
     anchor: "There is no anchor older than this. Before this moment, no light existed to see.",
+    from: 0.942,
   },
 ];
