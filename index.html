@@ -3,21 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COMP4020 prototype</title>
+    <title>Depth as Time</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header>
       <nav aria-label="Primary">
-        <a href="./">Home</a>
+        <a href="./">Depth as Time</a>
       </nav>
     </header>
     <main>
-      <h1>COMP4020 prototype</h1>
-      <p data-testid="intro">
-        Replace this with your prototype. This week's brief is on the course website;
-        <code>spec/README.md</code> explains how the checks in this repo relate to it.
-      </p>
+      <section class="hook">
+        <h1>Depth as Time</h1>
+        <p>
+          Everything you can see is already the past. Scroll outward, and
+          find out how far back it goes — and where it stops.
+        </p>
+      </section>
+      <div class="track" data-testid="track">
+        <div class="stage">
+          <div class="layers" data-testid="layers"></div>
+          <div class="hud" data-testid="hud">
+            <p class="hud-name" data-testid="hud-name"></p>
+            <p class="hud-distance" data-testid="hud-distance"></p>
+            <p class="hud-lookback" data-testid="hud-lookback"></p>
+            <p class="hud-anchor" data-testid="hud-anchor"></p>
+          </div>
+        </div>
+      </div>
+      <section class="payoff">
+        <p>
+          Keep scrolling, and every next object will be a little further away
+          — and a little further back in time — than the last.
+        </p>
+      </section>
+      <p class="visually-hidden" aria-live="polite" data-testid="status"></p>
     </main>
     <script type="module" src="./main.ts"></script>
   </body>
