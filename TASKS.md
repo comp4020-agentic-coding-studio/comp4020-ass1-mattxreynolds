@@ -16,6 +16,26 @@ see `CLAUDE.md`.
   `reflections/assignment-1.md` (150–300 words).
 - [ ] `/ship`, then verify the live URL at both viewports.
 
+- [x] Matt: objects still too small on desktop; Moon design approved but
+  Sun/Proxima Centauri star design disliked ("remove the sticks coming out,
+  add more texture"). Fixed sizing at the CSS layer (`.layer svg` from fixed
+  `12rem` to `clamp(12rem, 34vmin, 26rem)` in `styles.css`) so every object
+  scales up substantially on wide desktop viewports while staying numerically
+  unchanged on the 390×844 phone viewport (34vmin < 12rem floor there).
+  Removed `radialRays`/`diffractionSpike` flares from Sun, Proxima Centauri,
+  and Vega in `main.ts`; added a new seeded `surfaceTexture` generator in
+  `starfield.ts` (mottled light/dark blotches within the disk) in their place,
+  parameterised per star (warm granulation/sunspots for the Sun, reddish
+  starspots for Proxima, subtle blue-white mottling for Vega). 3C 273's
+  spikes deliberately left as-is — a quasar's diffraction-spike look reads as
+  a real photographic feature, not the "stick" look on stars that was
+  rejected. `pnpm check` green throughout. Verified in Chrome at true
+  1920×1080 and 390×844 (via `agent-browser set viewport`, not the unreliable
+  `open --viewport` flag) across all waypoints — desktop renders are ~2x
+  larger and Sun/Proxima/Vega show mottled texture with no spikes; phone
+  renders match prior sizing; 3C 273 and JADES-GS-z14-0 also checked at the
+  new size and read correctly.
+
 ## Done (collapsed)
 
 - [x] Fact-check waypoint numbers and anchors — see `PLAN.md`.
@@ -85,12 +105,25 @@ see `CLAUDE.md`.
   closing text (was a placeholder scoped to the old 2-waypoint slice).
   `pnpm check` green; `spec/depth-as-time.test.ts` thresholds updated again
   plus a new assertion for the `cmb` waypoint.
+- [x] Redesigned every inline SVG (Matt: too small/simple, galaxy shapes
+  especially needed to be "tons of tiny stars," not flat gradients). New
+  `starfield.ts` module: seeded-PRNG (`mulberry32`, not `Math.random()`, so
+  the field is identical every reload) star-dot generators, one shape per
+  galaxy type — face-on 2-arm spiral for Andromeda, edge-on disk+bulge for
+  Sagittarius A* (we view the Milky Way from inside its plane, so no arms
+  show), clumpy irregular for GN-z11/JADES (scientifically apt for young,
+  still-assembling high-z galaxies), cluster-of-dot-clusters for Virgo.
+  Flatten/rotation done via manual coordinate math rather than SVG
+  `transform`, so individual star dots stay circular. Proved on Andromeda
+  first, reviewed, then rolled out to the rest. Non-galaxy bodies (Moon,
+  Sun, Proxima, Vega, 3C 273) got richer hand-detail instead of a
+  star-field treatment — more craters + terminator shading, corona rays +
+  granulation, diffraction spikes, 3C 273's jet knots. `pnpm check` green
+  throughout. Screenshotted in Chrome at both 1920×1080 and 390×844 across
+  all 10 redesigned waypoints, including close-up enlarged views of the
+  galaxy shapes — all read correctly at both viewports.
 
 ## Open blockers / unresolved decisions
 
 - Text-position-follows-object-shape is explicitly deferred, not a
   blocker (see `PLAN.md`/session notes) — plain fixed HUD is fine for now.
-  Illustration fidelity (the spike's procedural starfields/spiral arms vs.
-  today's simple placeholder SVGs) is also open but not blocking — worth
-  raising before the cosmological-jump stage, since that's where "a field of
-  many stars" first needs to read well.
