@@ -38,6 +38,18 @@ Two entrance grammars, chosen per transition, not applied uniformly:
   no lateral offset — it fades in centred, directly ahead, then shrinks as a
   whole. This is the "that was just one of these" beat.
 
+A third, non-object treatment for the two narrative-bridge waypoints that
+aren't bodies at all (the reionization fog, and the CMB wall itself): a
+translucent veil over the whole stage, opacity driven by progress, that
+thickens until it obscures whatever object layer is behind it rather than
+being a positioned layer of its own — visually enacting "the universe itself
+was too foggy to see through," not another thing to zoom toward. The CMB
+waypoint reuses this same veil mechanism inverted (bright, not dark) rather
+than introducing a fourth grammar. This means a waypoint can have an HUD
+`from` threshold without a rendered layer — the code needs to treat "which
+waypoint is current" and "which layers get drawn" as two separate lists, not
+one, once the fog waypoint exists (see `main.ts`'s `staged`).
+
 A fixed HUD overlay shows discrete state — name, distance, lookback label,
 anchor — for whichever waypoint's `from` progress-threshold the current
 `progress` has most recently crossed. That discrete mapping (progress →

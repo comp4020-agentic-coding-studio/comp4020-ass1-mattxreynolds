@@ -8,10 +8,15 @@ see `CLAUDE.md`.
 - [ ] The cosmological jump (waypoints 8–11: 3C 273, GN-z11,
   JADES-GS-z14-0, reionization fog) and final CMB polish — build order
   stages 3–4 in `PLAN.md`. Same engine, extended per waypoint as before.
-  Entrance grammar for this stage still open: 3C 273→GN-z11→JADES are all
-  "one of many" reveals of a much younger universe rather than sibling
-  bodies, and the reionization fog is a narrative bridge, not a rendered
-  object — decide grammar/whether-to-render before hand-tuning keyframes.
+  Grammar decided: 3C 273 → GN-z11 → JADES-GS-z14-0 stay sibling-body
+  (each is still a discrete object; the escalation is carried by anchor
+  copy collapsing, not a new mechanic). The reionization fog (and later
+  the CMB) use a new non-object veil overlay instead — see "Core
+  interaction" in `PLAN.md`. Implementation note: `main.ts`'s `staged`
+  list currently conflates "HUD-current waypoint" with "has a rendered
+  layer" — needs splitting so the fog gets an HUD entry without a
+  LAYER_FRAMES/LAYER_MARKUP entry. Build the veil on the fog waypoint
+  first as the slice to prove before the sibling-body trio and CMB.
   Budget real time for the CMB waypoint and the `.payoff` closing text
   (currently a placeholder sentence in `index.html` scoped only to what's
   built) — that's the piece's actual payoff.
