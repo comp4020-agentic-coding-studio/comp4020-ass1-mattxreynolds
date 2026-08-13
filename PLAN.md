@@ -45,10 +45,12 @@ thickens until it obscures whatever object layer is behind it rather than
 being a positioned layer of its own — visually enacting "the universe itself
 was too foggy to see through," not another thing to zoom toward. The CMB
 waypoint reuses this same veil mechanism inverted (bright, not dark) rather
-than introducing a fourth grammar. This means a waypoint can have an HUD
-`from` threshold without a rendered layer — the code needs to treat "which
-waypoint is current" and "which layers get drawn" as two separate lists, not
-one, once the fog waypoint exists (see `main.ts`'s `staged`).
+than introducing a fourth grammar. Implemented: the veil is still a
+`LAYER_MARKUP`/`LAYER_FRAMES` entry like every other waypoint (so `main.ts`'s
+`staged` list needed no change) — its markup is a full-bleed gradient `div`
+instead of a small centred SVG, and its frames hold scale/position constant
+and ramp only opacity. Same data shape, different visual content; simpler
+than the two-list split this section originally anticipated.
 
 A fixed HUD overlay shows discrete state — name, distance, lookback label,
 anchor — for whichever waypoint's `from` progress-threshold the current

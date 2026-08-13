@@ -1,12 +1,16 @@
 import { WAYPOINTS } from "./waypoints";
 import { clampProgress, currentWaypoint, interpLayer, type LayerFrame } from "./zoom";
 
-// Waypoints 1-7 (Moon through Virgo Cluster) — build order stage 2, see
-// TASKS.md/PLAN.md. Two entrance grammars alternate deliberately: sibling
-// body (offset + oversized, converging in) for same-kind neighbours, field
-// reveal (centred, no lateral offset, shrinking as a whole) at the two
+// Waypoints 1-11 (Moon through the reionization fog) — build order stages
+// 2-3, see TASKS.md/PLAN.md. Two entrance grammars alternate deliberately:
+// sibling body (offset + oversized, converging in) for same-kind neighbours,
+// field reveal (centred, no lateral offset, shrinking as a whole) at the two
 // category jumps — star-field-as-galaxy at Sagittarius A*, galaxy-as-cluster
-// at Virgo Cluster.
+// at Virgo Cluster. The reionization fog is a third, non-object treatment:
+// its "layer" is a full-bleed veil div (styled in styles.css, not an SVG
+// icon) whose opacity ramps up over its own window, obscuring whatever real
+// object (jades-gs-z14-0) is still rendered behind it — same LAYER_MARKUP/
+// LAYER_FRAMES machinery as every other waypoint, just different markup.
 const LAYER_MARKUP: Record<string, string> = {
   moon: `
     <svg viewBox="0 0 100 100" role="img" aria-label="The Moon">
@@ -91,6 +95,47 @@ const LAYER_MARKUP: Record<string, string> = {
       <circle cx="18" cy="58" r="4" fill="#dfe3ff" opacity="0.65" />
     </svg>
   `,
+  "3c273": `
+    <svg viewBox="0 0 100 100" role="img" aria-label="Quasar 3C 273">
+      <defs>
+        <radialGradient id="q3c273-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffffff" />
+          <stop offset="35%" stop-color="#cfe8ff" />
+          <stop offset="100%" stop-color="#5fa8ff" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <path d="M50 4 L54 46 L96 50 L54 54 L50 96 L46 54 L4 50 L46 46 Z" fill="#eaf6ff" opacity="0.55" />
+      <circle cx="50" cy="50" r="42" fill="url(#q3c273-glow)" />
+      <circle cx="50" cy="50" r="10" fill="#ffffff" />
+    </svg>
+  `,
+  "gn-z11": `
+    <svg viewBox="0 0 100 100" role="img" aria-label="GN-z11">
+      <defs>
+        <radialGradient id="gnz11-core" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffcf9e" />
+          <stop offset="50%" stop-color="#ff7a4d" />
+          <stop offset="100%" stop-color="#c8371f" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="48" cy="52" rx="22" ry="14" fill="url(#gnz11-core)" transform="rotate(12 48 52)" />
+      <circle cx="48" cy="52" r="8" fill="#ffe3c2" opacity="0.85" />
+    </svg>
+  `,
+  "jades-gs-z14-0": `
+    <svg viewBox="0 0 100 100" role="img" aria-label="JADES-GS-z14-0">
+      <defs>
+        <radialGradient id="jades-core" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffb08a" />
+          <stop offset="50%" stop-color="#d9482a" />
+          <stop offset="100%" stop-color="#8f2113" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="50" cy="50" rx="17" ry="11" fill="url(#jades-core)" transform="rotate(-8 50 50)" />
+      <circle cx="50" cy="50" r="5" fill="#ffd9b8" opacity="0.8" />
+    </svg>
+  `,
+  "reionization-fog": `<div class="veil" aria-hidden="true"></div>`,
 };
 
 // {t, scale, x (vw), y (vh), opacity} — t is overall track progress, not
@@ -102,48 +147,74 @@ const LAYER_MARKUP: Record<string, string> = {
 const LAYER_FRAMES: Record<string, LayerFrame[]> = {
   moon: [
     { t: 0, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.12, scale: 0.05, x: 0, y: 0, opacity: 0 },
+    { t: 0.08, scale: 0.05, x: 0, y: 0, opacity: 0 },
   ],
   sun: [
-    { t: 0.02, scale: 2.2, x: 50, y: -8, opacity: 0 },
-    { t: 0.06, scale: 2.0, x: 40, y: -6, opacity: 1 },
-    { t: 0.12, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.17, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.27, scale: 0.05, x: 0, y: 0, opacity: 0 },
+    { t: 0.01, scale: 2.2, x: 50, y: -8, opacity: 0 },
+    { t: 0.04, scale: 2.0, x: 40, y: -6, opacity: 1 },
+    { t: 0.08, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.1, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.17, scale: 0.05, x: 0, y: 0, opacity: 0 },
   ],
   "proxima-centauri": [
-    { t: 0.17, scale: 2.2, x: -50, y: 6, opacity: 0 },
-    { t: 0.21, scale: 2.0, x: -40, y: 5, opacity: 1 },
-    { t: 0.27, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.32, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.42, scale: 0.05, x: 0, y: 0, opacity: 0 },
+    { t: 0.1, scale: 2.2, x: -50, y: 6, opacity: 0 },
+    { t: 0.13, scale: 2.0, x: -40, y: 5, opacity: 1 },
+    { t: 0.17, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.19, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.26, scale: 0.05, x: 0, y: 0, opacity: 0 },
   ],
   vega: [
-    { t: 0.32, scale: 2.2, x: 50, y: -6, opacity: 0 },
-    { t: 0.36, scale: 2.0, x: 40, y: -5, opacity: 1 },
-    { t: 0.42, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.47, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.61, scale: 0.05, x: 0, y: 0, opacity: 0 },
+    { t: 0.19, scale: 2.2, x: 50, y: -6, opacity: 0 },
+    { t: 0.22, scale: 2.0, x: 40, y: -5, opacity: 1 },
+    { t: 0.26, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.28, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.37, scale: 0.05, x: 0, y: 0, opacity: 0 },
   ],
   "sagittarius-a": [
-    { t: 0.47, scale: 2.6, x: 0, y: 0, opacity: 0 },
-    { t: 0.52, scale: 2.4, x: 0, y: 0, opacity: 1 },
-    { t: 0.61, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.66, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.76, scale: 0.05, x: 0, y: 0, opacity: 0 },
+    { t: 0.28, scale: 2.6, x: 0, y: 0, opacity: 0 },
+    { t: 0.32, scale: 2.4, x: 0, y: 0, opacity: 1 },
+    { t: 0.37, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.39, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.46, scale: 0.05, x: 0, y: 0, opacity: 0 },
   ],
   andromeda: [
-    { t: 0.66, scale: 2.2, x: -50, y: 5, opacity: 0 },
-    { t: 0.7, scale: 2.0, x: -40, y: 4, opacity: 1 },
-    { t: 0.76, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.81, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.95, scale: 0.05, x: 0, y: 0, opacity: 0 },
+    { t: 0.39, scale: 2.2, x: -50, y: 5, opacity: 0 },
+    { t: 0.42, scale: 2.0, x: -40, y: 4, opacity: 1 },
+    { t: 0.46, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.48, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.57, scale: 0.05, x: 0, y: 0, opacity: 0 },
   ],
   "virgo-cluster": [
-    { t: 0.81, scale: 2.6, x: 0, y: 0, opacity: 0 },
-    { t: 0.86, scale: 2.4, x: 0, y: 0, opacity: 1 },
-    { t: 0.95, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.48, scale: 2.6, x: 0, y: 0, opacity: 0 },
+    { t: 0.52, scale: 2.4, x: 0, y: 0, opacity: 1 },
+    { t: 0.57, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.59, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.66, scale: 0.05, x: 0, y: 0, opacity: 0 },
+  ],
+  "3c273": [
+    { t: 0.59, scale: 2.2, x: 50, y: -6, opacity: 0 },
+    { t: 0.62, scale: 2.0, x: 40, y: -5, opacity: 1 },
+    { t: 0.66, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.68, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.75, scale: 0.05, x: 0, y: 0, opacity: 0 },
+  ],
+  "gn-z11": [
+    { t: 0.68, scale: 2.2, x: -50, y: 5, opacity: 0 },
+    { t: 0.71, scale: 2.0, x: -40, y: 4, opacity: 1 },
+    { t: 0.75, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.77, scale: 1, x: 0, y: 0, opacity: 1 },
+    { t: 0.84, scale: 0.05, x: 0, y: 0, opacity: 0 },
+  ],
+  "jades-gs-z14-0": [
+    { t: 0.77, scale: 2.2, x: 50, y: -5, opacity: 0 },
+    { t: 0.8, scale: 2.0, x: 40, y: -4, opacity: 1 },
+    { t: 0.84, scale: 1, x: 0, y: 0, opacity: 1 },
     { t: 1, scale: 1, x: 0, y: 0, opacity: 1 },
+  ],
+  "reionization-fog": [
+    { t: 0.86, scale: 1, x: 0, y: 0, opacity: 0 },
+    { t: 0.95, scale: 1, x: 0, y: 0, opacity: 0.94 },
+    { t: 1, scale: 1, x: 0, y: 0, opacity: 0.94 },
   ],
 };
 

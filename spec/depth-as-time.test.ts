@@ -37,9 +37,10 @@ describe("depth-as-time: zoom engine", () => {
   it("picks the waypoint whose progress threshold has most recently been crossed", () => {
     const staged = WAYPOINTS.filter((w) => w.from !== undefined);
     expect(currentWaypoint(0, staged).id).toBe("moon");
-    expect(currentWaypoint(0.08, staged).id).toBe("moon");
-    expect(currentWaypoint(0.09, staged).id).toBe("sun");
-    expect(currentWaypoint(0.9, staged).id).toBe("virgo-cluster");
-    expect(currentWaypoint(1, staged).id).toBe("virgo-cluster");
+    expect(currentWaypoint(0.05, staged).id).toBe("moon");
+    expect(currentWaypoint(0.06, staged).id).toBe("sun");
+    expect(currentWaypoint(0.54, staged).id).toBe("virgo-cluster");
+    expect(currentWaypoint(0.92, staged).id).toBe("reionization-fog");
+    expect(currentWaypoint(1, staged).id).toBe("reionization-fog");
   });
 });

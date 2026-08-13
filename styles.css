@@ -64,7 +64,7 @@ nav a {
 
 .track {
   position: relative;
-  height: 1050vh;
+  height: 1650vh;
 }
 
 .stage {
@@ -93,6 +93,19 @@ nav a {
   width: 12rem;
   height: 12rem;
   filter: drop-shadow(0 0 2rem rgb(255 255 255 / 15%));
+}
+
+.veil {
+  position: absolute;
+  inset: -60%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(6 6 12 / 98%) 0%,
+    rgb(6 6 12 / 92%) 55%,
+    rgb(6 6 12 / 60%) 78%,
+    rgb(6 6 12 / 0%) 100%
+  );
 }
 
 .hud {

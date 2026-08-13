@@ -5,21 +5,12 @@ see `CLAUDE.md`.
 
 ## Current
 
-- [ ] The cosmological jump (waypoints 8–11: 3C 273, GN-z11,
-  JADES-GS-z14-0, reionization fog) and final CMB polish — build order
-  stages 3–4 in `PLAN.md`. Same engine, extended per waypoint as before.
-  Grammar decided: 3C 273 → GN-z11 → JADES-GS-z14-0 stay sibling-body
-  (each is still a discrete object; the escalation is carried by anchor
-  copy collapsing, not a new mechanic). The reionization fog (and later
-  the CMB) use a new non-object veil overlay instead — see "Core
-  interaction" in `PLAN.md`. Implementation note: `main.ts`'s `staged`
-  list currently conflates "HUD-current waypoint" with "has a rendered
-  layer" — needs splitting so the fog gets an HUD entry without a
-  LAYER_FRAMES/LAYER_MARKUP entry. Build the veil on the fog waypoint
-  first as the slice to prove before the sibling-body trio and CMB.
-  Budget real time for the CMB waypoint and the `.payoff` closing text
-  (currently a placeholder sentence in `index.html` scoped only to what's
-  built) — that's the piece's actual payoff.
+- [ ] Final CMB polish and the `.payoff` closing text — build order stage 4
+  in `PLAN.md`, the last waypoint. Reuse the veil mechanism from the fog
+  (see Done below), inverted: bright, not dark. Budget real time here —
+  the CMB is the piece's actual payoff, not "just another waypoint."
+  `.payoff` in `index.html` is currently a placeholder sentence scoped
+  only to what's built so far.
 
 ## Next
 
@@ -63,11 +54,29 @@ see `CLAUDE.md`.
   `pnpm check` green (typecheck, build, lint, 21 tests — updated
   `spec/depth-as-time.test.ts`'s hardcoded thresholds to match the retimed
   schedule).
+- [x] Waypoints 8–11 (3C 273, GN-z11, JADES-GS-z14-0, reionization fog)
+  rolled out — build order stage 3 done. 3C 273 → GN-z11 → JADES-GS-z14-0
+  stay sibling-body, alternating side, per the decided grammar. The
+  reionization fog uses the new veil treatment: implemented as a
+  `LAYER_MARKUP`/`LAYER_FRAMES` entry like every other waypoint (a
+  full-bleed gradient `div` instead of a small SVG, frames holding
+  scale/position constant and ramping only opacity) — turned out simpler
+  than the two-list `staged` split anticipated when the grammar was
+  decided, since it needed no change to `main.ts`'s render loop. JADES's
+  own layer holds at scale 1 with no exit shrink; the veil obscures it
+  from on top rather than it flying off. Progress schedule retimed again
+  for 11 stops (track height 1050vh → 1650vh; every earlier `from`
+  threshold rescaled, values unchanged relatively). Rendered and
+  screenshotted in Chrome at 1920×1080 and 390×844 across all four new
+  waypoints and the fog transition — the veil's vignette visibly thickens
+  over progress and the HUD switches to "The Reionization Fog" exactly at
+  its threshold; earlier waypoints (moon, sun, Sagittarius A*, Virgo
+  Cluster) re-checked and still read correctly after the retime.
+  `pnpm check` green (typecheck, build, lint, 21 tests — updated
+  `spec/depth-as-time.test.ts`'s thresholds again).
 
 ## Open blockers / unresolved decisions
 
-- Entrance grammar for waypoints 8–11 (3C 273 onward) not yet decided —
-  see `TASKS.md` Current.
 - Text-position-follows-object-shape is explicitly deferred, not a
   blocker (see `PLAN.md`/session notes) — plain fixed HUD is fine for now.
   Illustration fidelity (the spike's procedural starfields/spiral arms vs.
