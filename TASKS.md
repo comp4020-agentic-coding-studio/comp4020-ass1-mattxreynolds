@@ -5,26 +5,23 @@ see `CLAUDE.md`.
 
 ## Current
 
-- [ ] Roll out waypoints 3–7 (Proxima, Vega, Sagittarius A*, Andromeda,
-  Virgo Cluster) onto the continuous-zoom engine, per `PLAN.md` build order
-  stage 2. Moon→Sun slice is approved — this is the same engine
-  (`zoom.ts` + `LAYER_FRAMES`/`LAYER_MARKUP` in `main.ts`), extended object
-  by object. Per waypoint: pick the entrance grammar (sibling-body
-  side-entrance, used so far for Moon→Sun→Proxima-scale bodies, vs.
-  field-reveal centred-fade, due first at Sagittarius A*'s star field or
-  Andromeda), hand-tune its keyframes, render and eyeball both viewports.
+- [ ] The cosmological jump (waypoints 8–11: 3C 273, GN-z11,
+  JADES-GS-z14-0, reionization fog) and final CMB polish — build order
+  stages 3–4 in `PLAN.md`. Same engine, extended per waypoint as before.
+  Entrance grammar for this stage still open: 3C 273→GN-z11→JADES are all
+  "one of many" reveals of a much younger universe rather than sibling
+  bodies, and the reionization fog is a narrative bridge, not a rendered
+  object — decide grammar/whether-to-render before hand-tuning keyframes.
+  Budget real time for the CMB waypoint and the `.payoff` closing text
+  (currently a placeholder sentence in `index.html` scoped only to what's
+  built) — that's the piece's actual payoff.
 
 ## Next
 
-- [ ] The cosmological jump (waypoints 8–11: 3C 273, GN-z11,
-  JADES-GS-z14-0, reionization fog) and final CMB polish — build order
-  stages 3–4 in `PLAN.md`. Budget real time for the CMB waypoint and the
-  `.payoff` closing text (currently a placeholder sentence in `index.html`
-  scoped only to what's built) — that's the piece's actual payoff.
 - [ ] Resize-mid-scroll check (not yet done — only fixed-viewport checks so
   far).
 - [ ] `pnpm check:evidence` + linkinator, all green (full `pnpm check` is
-  already green as of the proof slice).
+  already green through waypoint 7).
 - [ ] `PROCESS.md` (400–600 words, 3–4 cited moments) and
   `reflections/assignment-1.md` (150–300 words).
 - [ ] `/ship`, then verify the live URL at both viewports.
@@ -47,13 +44,26 @@ see `CLAUDE.md`.
   stop) — confirmed with Matt this replaces the old hard-clamp-at-CMB plan.
 - [x] Matt reviewed the Moon→Sun slice live and approved it ("looks a lot
   better") — cleared to roll out the rest of the waypoint list.
+- [x] Waypoints 3–7 (Proxima, Vega, Sagittarius A*, Andromeda, Virgo
+  Cluster) rolled out onto the same engine. Field-reveal grammar assigned
+  to Sagittarius A* (star→galaxy) and Virgo Cluster (galaxy→cluster) per
+  Matt's confirmed choice; the rest stay sibling-body, alternating side of
+  entrance for visual variety. Progress range retimed for 7 waypoints
+  (track height 300vh → 1050vh; Sun's `from` moved 0.3 → 0.09 to make
+  room — same mechanic, just pacing). Rendered and screenshotted in Chrome
+  at 1920×1080 and 390×844 across all seven waypoints and both field-reveal
+  transitions — sibling entrances slide in from alternating sides and
+  converge; field-reveals grow in centred with no lateral offset, reading
+  as visually distinct from sibling transitions at both viewports.
+  `pnpm check` green (typecheck, build, lint, 21 tests — updated
+  `spec/depth-as-time.test.ts`'s hardcoded thresholds to match the retimed
+  schedule).
 
 ## Open blockers / unresolved decisions
 
-- None currently. Waypoint count (10–12), interaction (continuous scroll +
-  per-layer keyframes, two entrance grammars), and anchor policy
-  (per-waypoint, fact-checked) are all decided and proven on a slice Matt has
-  approved. Text-position-follows-object-shape is explicitly deferred, not a
+- Entrance grammar for waypoints 8–11 (3C 273 onward) not yet decided —
+  see `TASKS.md` Current.
+- Text-position-follows-object-shape is explicitly deferred, not a
   blocker (see `PLAN.md`/session notes) — plain fixed HUD is fine for now.
   Illustration fidelity (the spike's procedural starfields/spiral arms vs.
   today's simple placeholder SVGs) is also open but not blocking — worth

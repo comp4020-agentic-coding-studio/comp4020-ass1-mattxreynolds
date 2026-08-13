@@ -33,7 +33,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "8.3 minutes ago",
     lookbackYears: (8.3 * 60) / (365.25 * 24 * 3600),
     anchor: "Long enough to boil an egg.",
-    from: 0.3,
+    from: 0.09,
   },
   {
     id: "proxima-centauri",
@@ -42,6 +42,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "4.2 years ago",
     lookbackYears: 4.2,
     anchor: "About as long as a university degree.",
+    from: 0.24,
   },
   {
     id: "vega",
@@ -50,6 +51,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "25 years ago",
     lookbackYears: 25,
     anchor: "About a generation ago.",
+    from: 0.39,
   },
   {
     id: "sagittarius-a",
@@ -58,6 +60,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "26,000 years ago",
     lookbackYears: 26_000,
     anchor: "The last Ice Age. Woolly mammoths were still common.",
+    from: 0.56,
   },
   {
     id: "andromeda",
@@ -66,6 +69,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "2.5 million years ago",
     lookbackYears: 2.5e6,
     anchor: "Around when our own genus, Homo, first appears in the fossil record.",
+    from: 0.73,
   },
   {
     id: "virgo-cluster",
@@ -74,6 +78,7 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "54 million years ago",
     lookbackYears: 54e6,
     anchor: "Not long after the dinosaurs died out. Early primates were spreading.",
+    from: 0.9,
   },
   {
     id: "3c273",
