@@ -8,8 +8,6 @@ export interface Waypoint {
   /**
    * One factual "what is this" line — the object's identity, not a
    * relatable-time comparison. Always shown ungated where it renders.
-   * Only the 10 point-source waypoints have one; reionization fog and the
-   * CMB are narrative bridges, not discrete objects, so they don't get one.
    */
   whatIsIt?: string;
 }
@@ -116,6 +114,8 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "~13.6 billion years ago",
     lookbackYears: 13.6e9,
     anchor: "Not a limit of telescopes. The universe itself was still too foggy to see through.",
+    whatIsIt:
+      "Neutral hydrogen gas that filled the early universe, scattering light until the first stars and galaxies ionized it clear.",
   },
   {
     id: "cmb",
@@ -124,5 +124,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "13.8 billion years ago",
     lookbackYears: 13.8e9,
     anchor: "There is no anchor older than this. Before this moment, no light existed to see.",
+    whatIsIt: "The afterglow of the Big Bang itself — released the instant the universe first became transparent to light.",
   },
 ];

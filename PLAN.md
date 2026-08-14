@@ -89,7 +89,7 @@ back out (~85% through its own fade-out) so there's a brief near-black beat
 before the text appears, rather than the two crossfading for their full
 length.
 
-## Desktop info cards (rolled out to all 10 point-source waypoints)
+## Desktop info cards (rolled out to all 12 waypoints)
 
 Per-waypoint info was previously four short strings (name, distance,
 lookback, one gated relatable-analogy) — thin, and missing the single most
@@ -111,10 +111,16 @@ each waypoint's diegetic callout into two cards instead of one:
   threshold, so it can't get stuck open while scrolling past without moving
   the mouse.
 
-Applies to the 10 point-source waypoints (Moon through JADES-GS-z14-0), not
-reionization fog or the CMB — both stay on the fixed `.hud` permanently, not
-just for now: fog has no discrete object to anchor a leader-line to, and the
-CMB's meaning is already carried by `.payoff` immediately following it.
+Applies to all 12 waypoints, including reionization fog and the CMB (Matt's
+follow-up request: "rework the final 2 waypoints so they display their
+information in the same way as the other waypoints with 2 info cards"). Fog
+and the CMB have no discrete object and no entrance sweep to dodge — both are
+full-bleed/large-ellipse opacity-only backdrops, frozen at stage-centre the
+whole time (see `site-schedule.ts`) — so their card offsets aren't derived
+from the sibling/field-reveal rules below; they're chosen directly from the
+rendered image instead (fog's card sits lower-left to avoid a bright nebula
+cluster in its upper-right third; the CMB's sits lower-left too, clear of its
+large centred Planck-map ellipse).
 
 **Measurement card offsets are per-waypoint tuned, not a shared constant.**
 The original assumption was that one diagonal offset pair could be reused
@@ -152,11 +158,16 @@ stacked-offset geometry (see above).
 
 Desktop-only for now (`.callouts` already hides under the 768px breakpoint);
 how this looks on mobile — a second stacked HUD section rather than a second
-floating card, most likely — is an explicit later decision.
+floating card, most likely — is an explicit later decision. Mobile's fixed
+HUD also still gates the anchor line behind its own reveal button for the
+original 10 point-source waypoints only (`ANCHOR_REVEAL_IDS` in `main.ts`,
+kept deliberately separate from the card-having set so fog/CMB's new desktop
+cards don't change their — already always-visible — mobile anchor treatment)
+— reconciling that with desktop's always-visible anchor is part of the same
+deferred mobile decision.
 
-Data for all 10 point-source waypoints lives in `waypoints.ts` (`whatIsIt`
-field) and all 10 are wired into the card system (`CARD_OFFSETS` in
-`main.ts`).
+Data for all 12 waypoints lives in `waypoints.ts` (`whatIsIt` field) and all
+12 are wired into the card system (`CARD_OFFSETS` in `main.ts`).
 
 **Anchor fact: static, not click-gated (decided, rolled out to all 10).**
 The original click-to-reveal pill button was prototyped two ways side by

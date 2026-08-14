@@ -21,14 +21,14 @@ import { clampProgress, currentWaypoint, dampedScale, interpLayer, type LayerFra
 // anchor) — the only card still positioned this way. The identity card ("what
 // is this") is a cursor-following hover tooltip instead (see
 // wireIdentityHover) — no fixed offset, no leader line, since it appears
-// wherever the cursor already is. Covers all 10 point-source waypoints
-// (Moon through JADES-GS-z14-0); reionization fog and the CMB stay on the
-// existing always-visible `.hud` block permanently.
+// wherever the cursor already is. Covers all 12 waypoints now, including
+// reionization fog and the CMB (Matt's request — they used to stay on the
+// fixed `.hud` permanently; see PLAN.md for the superseded reasoning).
 //
-// Offsets are tuned per waypoint on two axes, not a shared constant: (1)
-// clearing the object's own image entirely — large enough magnitude that the
-// card's box doesn't overlap the ~34vmin-wide image at rest, using the open
-// screen space instead of crowding the object — and (2) avoiding each
+// The first 10 (point-source) offsets are tuned per waypoint on two axes:
+// (1) clearing the object's own image entirely — large enough magnitude that
+// the card's box doesn't overlap the ~34vmin-wide image at rest, using the
+// open screen space instead of crowding the object — and (2) avoiding each
 // waypoint's own entrance sweep: every sibling-body waypoint's card sits on
 // the side opposite its own LAYER_FRAMES entrance x sign, since a same-side
 // card would sit directly in the path of (or run off-screen with) its own
@@ -39,6 +39,16 @@ import { clampProgress, currentWaypoint, dampedScale, interpLayer, type LayerFra
 // alternates between every adjacent pair (not tied to side) so no two
 // waypoints' cards can stack on each other during a crossfade even when they
 // land on the same side.
+//
+// Fog and CMB are neither sibling nor field-reveal — they're full-bleed
+// opacity-only backdrops, frozen at x:0/y:0 the whole time (see
+// site-schedule.ts), so there's no entrance sweep to dodge either. Their
+// offsets are chosen purely by what the rendered image actually looks like:
+// fog has a bright nebula cluster in its upper-right third that a card would
+// clash with, so its card sits lower-left, in the image's darker, emptier
+// region. The CMB's Planck map is a large centred ellipse (up to 64rem) with
+// clear space in its corners; its card sits lower-left too, far enough out
+// to clear the ellipse horizontally even where the two overlap vertically.
 const CARD_OFFSETS: Record<string, { x: number; y: number }> = {
   moon: { x: -460, y: -130 },
   sun: { x: -480, y: 140 },
@@ -50,6 +60,8 @@ const CARD_OFFSETS: Record<string, { x: number; y: number }> = {
   "3c273": { x: -460, y: 140 },
   "gn-z11": { x: 460, y: -130 },
   "jades-gs-z14-0": { x: -460, y: 140 },
+  "reionization-fog": { x: -480, y: 170 },
+  cmb: { x: -560, y: 170 },
 };
 
 // A single click/tap listener drives every anchor-fact reveal (no hover) —
@@ -190,7 +202,28 @@ const staged = WAYPOINTS.map((waypoint) => ({
   (waypoint): waypoint is typeof waypoint & { from: number } =>
     waypoint.from !== undefined && Boolean(LAYER_FRAMES[waypoint.id]),
 );
-const GATED_IDS = new Set(Object.keys(CARD_OFFSETS));
+const HAS_CARD_IDS = new Set(Object.keys(CARD_OFFSETS));
+
+// Mobile's fixed HUD still gates the anchor line behind its own reveal
+// button — a leftover from before the anchor became always-visible on
+// desktop (see PLAN.md's "Anchor fact: static, not click-gated"); whether
+// mobile should match that is still an open, deferred decision (see
+// TASKS.md). Kept as its own explicit list rather than derived from
+// CARD_OFFSETS, so giving reionization-fog/cmb a desktop card above doesn't
+// also start gating their anchor on mobile — they've never been gated
+// there, and nothing here asked to change that.
+const ANCHOR_REVEAL_IDS = new Set([
+  "moon",
+  "sun",
+  "proxima-centauri",
+  "vega",
+  "sagittarius-a",
+  "andromeda",
+  "virgo-cluster",
+  "3c273",
+  "gn-z11",
+  "jades-gs-z14-0",
+]);
 
 // Shared by both callout kinds: position a card's static leader-line dog-leg
 // from its fixed offset (derived once here, not recomputed per frame).
@@ -258,8 +291,9 @@ if (track && layersEl) {
     rulerSegmentsEl.setAttribute("aria-hidden", "true");
   }
 
-  // Diegetic callouts: all 10 point-source waypoints (see CARD_OFFSETS). The
-  // measurement card's leader-line dog-leg is static local geometry — derived
+  // Diegetic callouts: all 12 waypoints now, including fog/cmb (see
+  // CARD_OFFSETS). The measurement card's leader-line dog-leg is static local
+  // geometry — derived
   // once here from the fixed offset, not recomputed per frame — while the
   // card itself is repositioned every frame in render() via --callout-x/-y to
   // track the object's live entrance/exit motion. The identity card has no
@@ -385,17 +419,18 @@ if (track && layersEl) {
       }
     }
 
-    const gated = GATED_IDS.has(current.id);
+    const anchorGated = ANCHOR_REVEAL_IDS.has(current.id);
+    const hasCard = HAS_CARD_IDS.has(current.id);
 
     if (hudName) hudName.textContent = current.name;
     if (hudDistance) hudDistance.textContent = current.distanceLabel;
     if (hudLookback) hudLookback.textContent = `You are seeing light that left ${current.lookbackLabel}`;
     if (hudAnchor) {
       hudAnchor.textContent = current.anchor;
-      hudAnchor.classList.toggle("gated", gated);
+      hudAnchor.classList.toggle("gated", anchorGated);
     }
-    if (hudAnchorReveal) hudAnchorReveal.hidden = !gated;
-    if (hudEl) hudEl.classList.toggle("hud-suppressed", gated || progress >= SITE_SCHEDULE.hudExitStart);
+    if (hudAnchorReveal) hudAnchorReveal.hidden = !anchorGated;
+    if (hudEl) hudEl.classList.toggle("hud-suppressed", hasCard || progress >= SITE_SCHEDULE.hudExitStart);
 
     // Each callout crossfades on its own object's own fade, rather than
     // snapping visible/hidden on the coarse current-waypoint cutover — this

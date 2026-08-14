@@ -357,7 +357,7 @@ nav a {
   }
 }
 
-/* Diegetic callouts: Moon/Sun only this slice (see CARD_OFFSETS in
+/* Diegetic callouts: all 12 waypoints (see CARD_OFFSETS in
    main.ts) — the desktop-only layer that replaces the fixed HUD for
    waypoints that have one. The measurement card's position tracks the
    object's live on-screen offset via --callout-x/-y (written every frame in
