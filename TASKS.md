@@ -116,6 +116,27 @@ see `CLAUDE.md`.
   during the Moon→Sun transition, and stays hidden on every other waypoint.
   Spot-checked 1920×1080 — `display: none` confirmed computed, no visual
   change from the pre-existing desktop layout.
+- [x] Rolled the mobile identity card out to the remaining 11 waypoints.
+  `MOBILE_IDENTITY_OFFSETS` (`main.ts`) now covers all 12 ids (the same set
+  as desktop's `CARD_OFFSETS`/`HAS_CARD_IDS`), grouped by the image's own
+  rendered mobile size rather than one-offset-per-waypoint: `x: 0`
+  everywhere (the card stays centred above the image and sways with the
+  same live sibling-entrance sweep the image itself gets, no per-waypoint
+  side needed), `y: -180` (Moon's proven value) for the four sibling-body
+  waypoints sized by the base clamp (~224px tall on a 390px phone), and
+  `y: -250` for the six field/point-source waypoints bumped to `min(92vw,
+  cap)` on mobile (~359px tall) plus the fog/CMB veils, which have no
+  discrete object to clear but fill the same screen area. `pnpm check`
+  green (typecheck, build, lint, 34 tests). Verified live in Chrome at
+  390×844: a coarse progress scrub across the whole track confirms the
+  card shows during every waypoint's hold and hides at every transition
+  gap and on the title/closing screens; `getBoundingClientRect` at each
+  waypoint's settled point confirms no horizontal or vertical overlap with
+  its image, including the tightest margins (the six `-250` waypoints);
+  screenshotted Sun, Sagittarius A*, 3C 273, the fog, and CMB to confirm
+  visually — all clear, legible, no collision even where the numeric
+  margin was under 15px. Spot-checked 1920×1080 across four waypoints —
+  `.identity-mobile` computed `display: none` throughout, unaffected.
 - [x] Two follow-up fixes to the mobile identity card after Matt reviewed the
   widen/attach version live. (1) Moved the card's rest position down and
   closer to the Moon (`MOBILE_IDENTITY_OFFSETS.moon.y`: -276 → -180,

@@ -161,10 +161,28 @@ const identityMobileText = document.querySelector<HTMLElement>('[data-testid="id
 // via the object's live x/y/scale transform, not a static screen position —
 // so the card "attaches" to the image: it slides in from the same side and
 // grows/shrinks the same way, at Matt's request, rather than fading in place.
-// Moon only for now (see TASKS.md) before rolling out to the rest, same as
-// the bottom-sheet HUD.
+// x stays 0 for every waypoint (the card sits centred above the image, so it
+// sways with the same live sibling-entrance sweep the image itself gets,
+// rather than needing its own per-waypoint side). y is grouped by the
+// image's own rendered mobile size (see styles.css's `.layer img` rules): the
+// four sibling-body waypoints sized by the base clamp (~224px tall on a
+// 390px-wide phone) get the Moon's proven -180; the six field/point-source
+// waypoints bumped to `min(92vw, cap)` on mobile (~359px tall) get a larger
+// -250 to clear that bigger footprint; the fog/CMB veils have no discrete
+// object to clear but fill the same screen area, so they use the same -250.
 const MOBILE_IDENTITY_OFFSETS: Record<string, { x: number; y: number }> = {
   moon: { x: 0, y: -180 },
+  sun: { x: 0, y: -180 },
+  "proxima-centauri": { x: 0, y: -180 },
+  vega: { x: 0, y: -180 },
+  "sagittarius-a": { x: 0, y: -250 },
+  andromeda: { x: 0, y: -250 },
+  "virgo-cluster": { x: 0, y: -250 },
+  "3c273": { x: 0, y: -250 },
+  "gn-z11": { x: 0, y: -250 },
+  "jades-gs-z14-0": { x: 0, y: -250 },
+  "reionization-fog": { x: 0, y: -250 },
+  cmb: { x: 0, y: -250 },
 };
 
 // `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint

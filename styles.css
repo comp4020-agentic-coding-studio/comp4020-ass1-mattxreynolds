@@ -370,7 +370,7 @@ nav a {
    blank space above the image rather than following the cursor. Hidden
    outside the mobile breakpoint entirely, and hidden by default even inside
    it — main.ts only reveals it for waypoints in MOBILE_IDENTITY_OFFSETS
-   (Moon only for now, proved before rolling out further). */
+   (all 12, same set as the desktop measurement cards). */
 .identity-mobile {
   display: none;
 }
