@@ -206,28 +206,6 @@ nav a {
   margin: 0.5rem 0 0;
 }
 
-/* Moon/Sun gate their anchor fact behind a reveal button (see main.ts
-   wireReveal); every other waypoint has no `.gated` class and stays
-   always-visible, unchanged from before this feature existed. */
-.hud-anchor.gated:not(.revealed) {
-  display: none;
-}
-
-.hud-anchor-reveal {
-  font: inherit;
-  font-size: 0.85rem;
-  color: inherit;
-  background: rgb(255 255 255 / 12%);
-  border: none;
-  border-radius: 999px;
-  padding: 0.3rem 0.75rem;
-  cursor: pointer;
-}
-
-.hud-anchor-reveal:hover {
-  background: rgb(255 255 255 / 20%);
-}
-
 /* On desktop, a waypoint with its own diegetic callout (see `.callouts`
    below) uses that instead of the fixed HUD; on phone the HUD stays the
    one constant instrument panel regardless — this rule only fires

@@ -4,6 +4,36 @@ Small rolling working set. Collapse to one line + commit link once done —
 see `CLAUDE.md`.
 
 ## Next
+- [x] Mobile adaptation, step 1: fixed the mobile HUD staying visible over
+  the closing text (`hud-suppressed` conflated "handed off to a desktop
+  card" with "reached the closing beat" under one `@media (width >=
+  768px)`-gated class, so the closing signal never took effect on mobile).
+  Split into `hud-suppressed` (desktop-only, unchanged) and a new
+  viewport-independent `hud-ended`. See `f6292f1`.
+- [x] Mobile adaptation, step 2: dropped the mobile anchor click-gate
+  (`ANCHOR_REVEAL_IDS`/`wireReveal`/`.hud-anchor-reveal` button) so the
+  anchor fact is always-visible on every waypoint, matching the static
+  (not click-gated) anchor decision already made for desktop — see
+  `PLAN.md`. `pnpm check` green (typecheck, build, lint, 34 tests).
+  Verified live in Chrome at 390×844: Moon and Vega (both previously
+  gated) now show the anchor line immediately with no button in the DOM;
+  spot-checked 1920×1080 unaffected (HUD still correctly suppressed in
+  favour of the diegetic card there).
+- [ ] Mobile adaptation, step 3: fix title/closing resting-scale overflow
+  on mobile (`TITLE_SCALE`/`CLOSING_SCALE` = 1.8 in `site-schedule.ts`
+  overflows a 390px viewport — 390 × 1.8 = 702px measured bounding-box
+  width — since it's a CSS transform on top of a correctly-sized layout
+  box, not a layout bug). Make responsive without changing desktop's
+  rendered value.
+- [ ] Mobile adaptation, step 4: bottom-sheet info pattern proof-of-concept
+  on Moon only (collapsed slim strip + tap/swipe-to-expand full card),
+  replacing the plain fixed HUD.
+- [ ] Mobile adaptation, step 5: roll bottom-sheet pattern out to the
+  remaining 11 waypoints.
+- [ ] Mobile adaptation, step 6: full mobile regression pass (resize
+  mid-scroll, touch-drag ruler thumb, flick-scroll) + re-screenshot
+  desktop at fixed progress points to confirm pixel-identical to the
+  pre-mobile-work baseline.
 - [x] Ruler now spans almost the full viewport height (`--ruler-height`:
   `min(60vh, 28rem)` → `min(92vh, 68rem)` desktop, `min(55vh, 24rem)` →
   `min(88vh, 44rem)` mobile), moved onto the `.ruler` container itself via a
@@ -64,10 +94,6 @@ see `CLAUDE.md`.
   measurement cards + hover identity tooltips render correctly with no
   overlap on either waypoint's imagery; mobile unaffected (still
   full-width HUD, not gated). See `6fc128d`.
-- [ ] Decide mobile treatment for the two-card layout (deferred, not
-  assumed to be "the same, just smaller" — see PLAN.md).
-- [ ] Resize-mid-scroll check (not yet done — only fixed-viewport checks so
-  far).
 - [ ] `pnpm check:evidence` + linkinator, all green (full `pnpm check` is
   already green through the CMB, all 12 waypoints).
 - [ ] `PROCESS.md` (400–600 words, 3–4 cited moments) and

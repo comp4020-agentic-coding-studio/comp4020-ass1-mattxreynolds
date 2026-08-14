@@ -48,29 +48,6 @@ const CARD_OFFSETS: Record<string, { x: number; y: number }> = {
   cmb: { x: 560, y: 170 },
 };
 
-// A single click/tap listener drives every anchor-fact reveal (no hover) —
-// modern browsers normalise touch taps to `click` with no double-fire, so
-// this is immune to the double-toggle risk a hover/tap split would have on
-// hybrid touchscreen-laptop devices. Reused as-is for the CMB wall-cause
-// reveal later; no changes needed here for that.
-function wireReveal(trigger: HTMLButtonElement, content: HTMLElement) {
-  let revealed = false;
-  const apply = () => {
-    trigger.setAttribute("aria-expanded", String(revealed));
-    content.classList.toggle("revealed", revealed);
-  };
-  trigger.addEventListener("click", () => {
-    revealed = !revealed;
-    apply();
-  });
-  return {
-    collapse: () => {
-      revealed = false;
-      apply();
-    },
-  };
-}
-
 // Identity card ("what is this") appears at the cursor while hovering the
 // waypoint's own image, rather than tracking scroll progress — `position:
 // fixed`, moved with mousemove, so it uses raw client coordinates directly.
@@ -171,7 +148,6 @@ const hudName = document.querySelector<HTMLElement>('[data-testid="hud-name"]');
 const hudDistance = document.querySelector<HTMLElement>('[data-testid="hud-distance"]');
 const hudLookback = document.querySelector<HTMLElement>('[data-testid="hud-lookback"]');
 const hudAnchor = document.querySelector<HTMLElement>('[data-testid="hud-anchor"]');
-const hudAnchorReveal = document.querySelector<HTMLButtonElement>('[data-testid="hud-anchor-reveal"]');
 const rulerSegmentsEl = document.querySelector<HTMLElement>('[data-testid="ruler-segments"]');
 const rulerInput = document.querySelector<HTMLInputElement>('[data-testid="ruler-input"]');
 const calloutsEl = document.querySelector<HTMLElement>('[data-testid="callouts"]');
@@ -187,27 +163,6 @@ const staged = WAYPOINTS.map((waypoint) => ({
     waypoint.from !== undefined && Boolean(LAYER_FRAMES[waypoint.id]),
 );
 const HAS_CARD_IDS = new Set(Object.keys(CARD_OFFSETS));
-
-// Mobile's fixed HUD still gates the anchor line behind its own reveal
-// button — a leftover from before the anchor became always-visible on
-// desktop (see PLAN.md's "Anchor fact: static, not click-gated"); whether
-// mobile should match that is still an open, deferred decision (see
-// TASKS.md). Kept as its own explicit list rather than derived from
-// CARD_OFFSETS, so giving reionization-fog/cmb a desktop card above doesn't
-// also start gating their anchor on mobile — they've never been gated
-// there, and nothing here asked to change that.
-const ANCHOR_REVEAL_IDS = new Set([
-  "moon",
-  "sun",
-  "proxima-centauri",
-  "vega",
-  "sagittarius-a",
-  "andromeda",
-  "virgo-cluster",
-  "3c273",
-  "gn-z11",
-  "jades-gs-z14-0",
-]);
 
 // Shared by both callout kinds: position a card's static leader-line dog-leg
 // from its fixed offset (derived once here, not recomputed per frame).
@@ -328,9 +283,6 @@ if (track && layersEl) {
     }
   }
 
-  const hudAnchorRevealCtl =
-    hudAnchorReveal && hudAnchor ? wireReveal(hudAnchorReveal, hudAnchor) : null;
-
   const trackMetrics = () => {
     const rect = track.getBoundingClientRect();
     const trackTop = window.scrollY + rect.top;
@@ -403,17 +355,12 @@ if (track && layersEl) {
       }
     }
 
-    const anchorGated = ANCHOR_REVEAL_IDS.has(current.id);
     const hasCard = HAS_CARD_IDS.has(current.id);
 
     if (hudName) hudName.textContent = current.name;
     if (hudDistance) hudDistance.textContent = current.distanceLabel;
     if (hudLookback) hudLookback.textContent = `You are seeing light that left ${current.lookbackLabel}`;
-    if (hudAnchor) {
-      hudAnchor.textContent = current.anchor;
-      hudAnchor.classList.toggle("gated", anchorGated);
-    }
-    if (hudAnchorReveal) hudAnchorReveal.hidden = !anchorGated;
+    if (hudAnchor) hudAnchor.textContent = current.anchor;
     if (hudEl) {
       hudEl.classList.toggle("hud-suppressed", hasCard);
       // Unlike hud-suppressed (a desktop-only concern: a diegetic callout has
@@ -452,7 +399,6 @@ if (track && layersEl) {
 
     if (current.id !== lastId) {
       lastId = current.id;
-      hudAnchorRevealCtl?.collapse();
       if (status) status.textContent = `Now viewing: ${current.name}, light from ${current.lookbackLabel}.`;
     }
   };
