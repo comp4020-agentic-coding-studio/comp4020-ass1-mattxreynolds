@@ -110,7 +110,7 @@ export const WAYPOINTS: Waypoint[] = [
   {
     id: "reionization-fog",
     name: "The Reionization Fog",
-    distanceLabel: "past every galaxy any telescope could ever resolve",
+    distanceLabel: "Beyond the reach of any telescope",
     lookbackLabel: "~13.6 billion years ago",
     lookbackYears: 13.6e9,
     anchor: "Not a limit of telescopes. The universe itself was still too foggy to see through.",
