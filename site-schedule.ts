@@ -6,8 +6,12 @@ import { buildSchedule, normalizeSchedule, type GapConfig, type PhaseDurations, 
 // tighter, not just the readable part. `hold` trimmed again on its own
 // (170 -> 145) per a second round of feedback that the fully-settled,
 // nothing-changing beat still ran a little long relative to everything
-// either arriving or leaving.
-const DURATIONS: PhaseDurations = { fadeIn: 75, converge: 90, hold: 145, exitShrink: 140 };
+// either arriving or leaving. Cut again, across the board, per Matt's
+// request to reduce total scroll distance site-wide: both the transition
+// phases (fadeIn/converge/exitShrink) and the static hold trimmed further,
+// hold proportionally more since it's the "nothing is changing" beat Matt
+// called out separately from the transitions themselves.
+const DURATIONS: PhaseDurations = { fadeIn: 50, converge: 60, hold: 85, exitShrink: 95 };
 
 // Sibling transitions overlap a little more than the first retune (-25 ->
 // -30) per Matt's follow-up "very very slightly more" feedback. Field-reveal
@@ -17,8 +21,11 @@ const DURATIONS: PhaseDurations = { fadeIn: 75, converge: 90, hold: 145, exitShr
 // exit-shrink and the field's fade-in now genuinely coincide, the same way
 // sibling transitions do, just with a deeper overlap since a point
 // "joining" a field it's about to be revealed as part of should linger
-// longer than one sibling object handing off to the next.
-const GAPS: GapConfig = { sibling: -30, fieldReveal: -40 };
+// longer than one sibling object handing off to the next. Scaled down
+// alongside DURATIONS above so the overlap stays the same proportion of
+// the (now shorter) transition it's cutting into, rather than swallowing
+// a bigger share of it.
+const GAPS: GapConfig = { sibling: -20, fieldReveal: -25 };
 
 // The two entrance grammars alternate per PLAN.md: sibling body (offset +
 // oversized, converging in, alternating side) for same-kind neighbours,
@@ -53,11 +60,13 @@ const POINT_SOURCE_SLOTS: SlotSpec[] = [
 // timed off the point-source schedule's own cursor so the whole journey is
 // still one source of truth. Both holds trimmed slightly (250 -> 210,
 // 160 -> 135) alongside DURATIONS.hold, for the same reason: these are
-// static, nothing-changing beats too, not fade/crossfade phases.
-const FOG_FADE_IN = 110;
-const FOG_HOLD = 210;
-const FOG_CMB_CROSSFADE = 110;
-const CMB_HOLD = 135;
+// static, nothing-changing beats too, not fade/crossfade phases. Cut again
+// alongside DURATIONS/GAPS above, holds proportionally more than the
+// crossfade, for the same site-wide "less scrolling" pass.
+const FOG_FADE_IN = 75;
+const FOG_HOLD = 120;
+const FOG_CMB_CROSSFADE = 75;
+const CMB_HOLD = 80;
 
 // The title layer holds at a large resting size, then shrinks away while
 // fading — the same "exit: shrink" shape every waypoint uses on its way out
@@ -71,7 +80,7 @@ const CMB_HOLD = 135;
 // than a new constant, just to give the title's own exit the same order of
 // magnitude as every other waypoint's entrance/exit phases.
 const TITLE_SCALE = 1.8;
-const TITLE_HOLD = 240;
+const TITLE_HOLD = 150;
 const TITLE_EXIT = DURATIONS.fadeIn + DURATIONS.converge;
 const TITLE_EXIT_END = TITLE_HOLD + TITLE_EXIT;
 
@@ -91,8 +100,9 @@ const MOON_ENTRANCE_START = TITLE_HOLD + TITLE_EXIT * 0.85;
 // feedback: the CMB shouldn't hold forever with the text overlaid on it —
 // it should fade OUT, leaving only the text, and the text shouldn't start
 // arriving until the CMB is nearly gone (not concurrently with the fade-out
-// starting). CMB_FADE_OUT is that opacity 1 -> 0 ramp.
-const CMB_FADE_OUT = 130;
+// starting). CMB_FADE_OUT is that opacity 1 -> 0 ramp. Cut alongside
+// everything else above for the same site-wide scroll-length pass.
+const CMB_FADE_OUT = 90;
 
 // The closing text's entrance mirrors the title's exit in reverse — starts
 // oversized and fades in while shrinking down to its settled size (scale 1),
