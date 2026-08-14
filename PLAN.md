@@ -38,30 +38,29 @@ Two entrance grammars, chosen per transition, not applied uniformly:
   no lateral offset — it fades in centred, directly ahead, then shrinks as a
   whole. This is the "that was just one of these" beat.
 
-A third, non-object treatment for the two narrative-bridge waypoints that
-aren't bodies at all (the reionization fog, and the CMB wall itself): a
-translucent veil over the whole stage, opacity driven by progress, that
-thickens until it obscures whatever object layer is behind it rather than
-being a positioned layer of its own — visually enacting "the universe itself
-was too foggy to see through," not another thing to zoom toward. The CMB
-waypoint reuses this same veil mechanism inverted (bright, not dark) rather
-than introducing a fourth grammar. Implemented: the veil is still a
-`LAYER_MARKUP`/`LAYER_FRAMES` entry like every other waypoint (so `main.ts`'s
-`staged` list needed no change) — its markup is a full-bleed gradient `div`
-instead of a small centred SVG, and its frames hold scale/position constant
-and ramp only opacity. Same data shape, different visual content; simpler
-than the two-list split this section originally anticipated.
+The reionization fog and the CMB (the two narrative-bridge waypoints that
+aren't bodies in the same sense as the rest) use the same
+`LAYER_MARKUP`/`LAYER_FRAMES` machinery and the same `<img>` markup as every
+other waypoint — no third grammar in the JS. Each gets a scoped CSS size
+override instead: the fog is full-bleed (`width/height: 100%`,
+`object-fit: cover`, no drop-shadow — there's no edge to cast one from), and
+the CMB renders much larger than the default waypoint clamp. (An earlier
+build treated them as full-bleed CSS "veil" divs meant to visually obscure
+the stage rather than sit as an object; that was dropped in favour of
+consistency — a single photo per waypoint, just sized differently — see Git
+history for the veil version.)
 
-**Fog → CMB decision (confirmed with Matt before building):** the dark fog
-veil ramps up then holds at its maximum forever — it never recedes, because
-the thesis is that there's nothing to pass *through*, only a wall to reach.
-The CMB's bright veil is a second, separate layer appended after the fog in
-`WAYPOINTS` order, so it paints on top of the held darkness: the wall reveals
-itself as what the fog was hiding all along, not a passage to somewhere
-lighter beyond it. After its own peak (near-total whiteout), the bright veil
-recedes back to 0 before the track ends, so `.payoff` lands on the site's
-ordinary dark background — a deliberate return to calm after the gut-punch,
-not a hard white-to-dark cut.
+**Fog → CMB timing (current):** the fog ramps up to full opacity, holds, then
+fades out exactly as the CMB fades in — a synchronised crossfade rather than
+a hard cut, so the wall is reached through dissolving fog rather than a jump
+cut. The CMB then holds at full opacity for the rest of the track, including
+into `.payoff` — it doesn't recede. The wall is the last thing on screen; the
+closing text arrives over it, not after a fade back to the ordinary dark
+background.
+
+**Fog/CMB imagery (confirmed with Matt):** `reionization-fog.png` and
+`cmb.png` — the latter is the real Planck all-sky temperature-anisotropy map,
+used literally rather than a stylised blackbody-glow treatment.
 
 A fixed HUD overlay shows discrete state — name, distance, lookback label,
 anchor — for whichever waypoint's `from` progress-threshold the current

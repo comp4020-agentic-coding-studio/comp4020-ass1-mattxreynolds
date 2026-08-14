@@ -89,36 +89,28 @@ nav a {
   transform-origin: 50% 50%;
 }
 
-.layer svg {
+.layer svg,
+.layer img {
   width: clamp(12rem, 34vmin, 26rem);
   height: clamp(12rem, 34vmin, 26rem);
+  object-fit: contain;
   filter: drop-shadow(0 0 2rem rgb(255 255 255 / 15%));
 }
 
-.veil {
-  position: absolute;
-  inset: -60%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgb(6 6 12 / 98%) 0%,
-    rgb(6 6 12 / 92%) 55%,
-    rgb(6 6 12 / 60%) 78%,
-    rgb(6 6 12 / 0%) 100%
-  );
+/* The fog is the one waypoint meant to blot out the whole view, not sit
+   as a discrete object — full-bleed, no drop-shadow (there's no edge to
+   cast one from). */
+.layer[data-id="reionization-fog"] img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  filter: none;
 }
 
-/* Recombination-era plasma glowed white-hot, not clinical white — a
-   ~3000K blackbody peaking in visible white/orange, not the cold
-   microwave it's redshifted to today. */
-.veil-bright {
-  background: radial-gradient(
-    circle,
-    rgb(255 253 246 / 100%) 0%,
-    rgb(255 243 214 / 96%) 45%,
-    rgb(255 208 140 / 70%) 75%,
-    rgb(255 208 140 / 0%) 100%
-  );
+.layer[data-id="cmb"] img {
+  width: clamp(20rem, 80vmin, 55rem);
+  height: clamp(20rem, 80vmin, 55rem);
 }
 
 .hud {
