@@ -94,6 +94,30 @@ see `CLAUDE.md`.
   (typecheck, build, lint, 34 tests). Verified live in Chrome at 390×844
   across all 6 affected waypoints plus CMB — all settle within the
   viewport with margin, no cropping. See `a3d9583`.
+- [x] Fixed the mobile HUD showing "The Moon" at the bottom of the title
+  screen. Root cause: `currentWaypoint` (`zoom.ts`) defaults `current` to
+  `staged[0]` (Moon) from progress 0 — before Moon's own entrance has even
+  begun — and mobile's always-on HUD has no suppression gate for that,
+  unlike desktop's `hud-suppressed`, which happens to be true for every
+  waypoint (all 12 now have cards) and so coincidentally masks the same
+  leak there. First fix attempt gated on `current`'s own live opacity, which
+  killed the title leak but introduced a self-caught regression: opacity
+  also dips near-zero during any ordinary mid-track crossfade hand-off (the
+  outgoing waypoint fading out just before the incoming one becomes
+  `current`), so the HUD briefly blanked on every waypoint transition, not
+  just the title. Replaced with a static `FIRST_ENTRANCE_START` constant
+  (`main.ts`, the first waypoint's own first keyframe `t`, computed once)
+  and a new `hud-not-started` class gated on `progress < FIRST_ENTRANCE_START`
+  — a fixed schedule point rather than a live opacity read, so it can't
+  re-trigger later in the track. `pnpm check` green (typecheck, build, lint,
+  34 tests). Verified live in Chrome at 390×844: an opacity/display scan
+  from p=0 to p=0.16 confirms the HUD is hidden only through Moon's own
+  fade-in (p≈0–0.024) then stays `block` continuously through the
+  Moon→Sun hand-off with no flicker; screenshot of the title screen
+  confirms no Moon info visible; closing behaviour unaffected (still
+  `display: none` at p=0.95–1.0). Spot-checked 1920×1080 across six
+  progress points — HUD stays `display: none` throughout via
+  `hud-suppressed`, matching pre-existing desktop behaviour.
 - [x] Built the mobile "what is this?" floating card, proved on Moon only.
   Desktop's identity tooltip only appears on hover, which has no touch
   equivalent, so mobile gets an always-rendered card instead

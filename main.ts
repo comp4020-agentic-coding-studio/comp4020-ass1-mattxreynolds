@@ -197,6 +197,13 @@ const staged = WAYPOINTS.map((waypoint) => ({
 );
 const HAS_CARD_IDS = new Set(Object.keys(CARD_OFFSETS));
 
+// The progress fraction at which the very first waypoint's entrance actually
+// starts (its own first keyframe, opacity still 0) — a fixed point on the
+// schedule, not a live opacity read, so it only ever gates the title lead-in
+// and never re-triggers on a later waypoint's own crossfade dip. See
+// hud-not-started in render().
+const FIRST_ENTRANCE_START = LAYER_FRAMES[staged[0]?.id ?? ""]?.[0]?.t ?? 0;
+
 // Shared by both callout kinds: position a card's static leader-line dog-leg
 // from its fixed offset (derived once here, not recomputed per frame).
 function positionLeaderLine(card: HTMLElement, offset: { x: number; y: number }) {
@@ -416,6 +423,19 @@ if (track && layersEl) {
       // taken over), this is "we've reached the closing beat" — true on every
       // viewport, so it can't ride the same desktop-gated CSS rule.
       hudEl.classList.toggle("hud-ended", progress >= SITE_SCHEDULE.hudExitStart);
+      // `current` defaults to the Moon (staged[0]) from progress 0 — before
+      // the title has even started fading out and long before the Moon's own
+      // entrance begins — so without this, mobile's always-on HUD (it has no
+      // hasCard suppression, see hud-suppressed's comment above) shows "The
+      // Moon" at the bottom of the title screen. Desktop never showed this
+      // because every waypoint has a card, so hud-suppressed already hid it
+      // there; mobile has nothing else gating it. Gated on a fixed progress
+      // threshold rather than current's own live opacity — an opacity read
+      // also dips near-zero during ordinary mid-track crossfades (the
+      // outgoing waypoint fading out just before the incoming one officially
+      // becomes `current`), which briefly blanked the HUD on every waypoint
+      // handoff, not just the title lead-in.
+      hudEl.classList.toggle("hud-not-started", progress < FIRST_ENTRANCE_START);
     }
 
     if (identityMobileEl && identityMobileText) {

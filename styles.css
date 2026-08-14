@@ -232,6 +232,15 @@ nav a {
   display: none;
 }
 
+/* Same "every viewport" reasoning as hud-ended above: before the Moon has
+   actually started appearing, there's nothing to show yet — without this,
+   mobile's always-on HUD (no hasCard suppression to ride, unlike desktop)
+   shows the Moon's info at the bottom of the title screen. See hud-not-started
+   in main.ts. */
+.hud.hud-not-started {
+  display: none;
+}
+
 /* Depth ruler: equal-length segment per waypoint (see ruler.ts), not
    true-to-scale — real lookback times span ten orders of magnitude, so a
    proportional ruler would collapse everything but the last segment to
