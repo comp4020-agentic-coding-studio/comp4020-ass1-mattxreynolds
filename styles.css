@@ -369,11 +369,19 @@ nav a {
    styled like the desktop hover card (.callout-identity) but sitting in the
    blank space above the image rather than following the cursor. Hidden
    outside the mobile breakpoint entirely, and hidden by default even inside
-   it — main.ts only reveals it for waypoints in MOBILE_IDENTITY_IDS (Moon
-   only for now, proved before rolling out further). */
+   it — main.ts only reveals it for waypoints in MOBILE_IDENTITY_OFFSETS
+   (Moon only for now, proved before rolling out further). */
 .identity-mobile {
   display: none;
 }
+
+/* `.identity-mobile` and `[hidden]` are both plain classes/attributes at
+   equal specificity, so without `:not([hidden])` the mobile block's own
+   `display: block` (below) would always beat the browser's `[hidden] {
+   display: none }` — author styles win ties against the user-agent
+   stylesheet regardless of source order. That let the card render (at
+   whatever stale opacity/scale main.ts last set) on every waypoint and the
+   title screen, not just the ones main.ts actually shows it for. */
 
 @media (width <= 767px) {
   /* Horizontal bar under the header instead of desktop's vertical
@@ -468,8 +476,9 @@ nav a {
      `left: 50%` gets its shrink-to-fit width silently capped to the
      remaining half of the container (a real, if obscure, quirk of the CSS
      auto-width algorithm), which pinned it to the right half of the
-     viewport instead of centring it until this was found and fixed. */
-  .identity-mobile {
+     viewport instead of centring it until this was found and fixed.
+     `:not([hidden])` matters here — see the base rule above. */
+  .identity-mobile:not([hidden]) {
     display: block;
     position: absolute;
     top: 50%;

@@ -164,7 +164,7 @@ const identityMobileText = document.querySelector<HTMLElement>('[data-testid="id
 // Moon only for now (see TASKS.md) before rolling out to the rest, same as
 // the bottom-sheet HUD.
 const MOBILE_IDENTITY_OFFSETS: Record<string, { x: number; y: number }> = {
-  moon: { x: 0, y: -276 },
+  moon: { x: 0, y: -180 },
 };
 
 // `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint
@@ -412,8 +412,13 @@ if (track && layersEl) {
       if (visible && state && offset) {
         identityMobileText.textContent = current.whatIsIt ?? "";
         identityMobileEl.style.opacity = String(state.opacity);
-        const px = (state.x / 100) * window.innerWidth + offset.x;
-        const py = (state.y / 100) * window.innerHeight + offset.y;
+        // Scale the offset itself by the object's own opacity: at full opacity
+        // the card sits fully clear of the image, but as opacity fades toward
+        // 0 (entering or exiting) the offset fades toward 0 too, so the card
+        // converges onto the object's own position instead of just shrinking
+        // in place at a fixed spot while everything around it moves.
+        const px = (state.x / 100) * window.innerWidth + offset.x * state.opacity;
+        const py = (state.y / 100) * window.innerHeight + offset.y * state.opacity;
         identityMobileEl.style.setProperty("--identity-x", `${px}px`);
         identityMobileEl.style.setProperty("--identity-y", `${py}px`);
         identityMobileEl.style.setProperty("--identity-scale", String(dampedScale(state.scale)));

@@ -116,6 +116,29 @@ see `CLAUDE.md`.
   during the Moon→Sun transition, and stays hidden on every other waypoint.
   Spot-checked 1920×1080 — `display: none` confirmed computed, no visual
   change from the pre-existing desktop layout.
+- [x] Two follow-up fixes to the mobile identity card after Matt reviewed the
+  widen/attach version live. (1) Moved the card's rest position down and
+  closer to the Moon (`MOBILE_IDENTITY_OFFSETS.moon.y`: -276 → -180,
+  shrinking the gap between card and image from ~117px to ~21px), and made
+  it converge toward the object's own position as it fades rather than
+  holding still while shrinking: `--identity-x`/`--identity-y` now multiply
+  the fixed offset by the object's own `state.opacity`, so at opacity 0 the
+  offset is 0 and the card sits exactly on the object's (centred) position
+  — verified via a progress scrub showing the card's centre converging to
+  (195, ~419) on a 390×844 viewport, matching the image's own collapse
+  point, during the Moon→Sun exit. (2) Fixed the card being faintly visible
+  on the title screen and every other waypoint: the mobile media query's
+  `.identity-mobile { display: block }` had the same specificity as the
+  browser's `[hidden] { display: none }`, and author styles win that tie
+  regardless of the `hidden` attribute — so the card was always rendered on
+  mobile, visible at whatever stale opacity main.ts had last set, not just
+  hidden as intended. Fixed by scoping the override to
+  `.identity-mobile:not([hidden])`. `pnpm check` green (typecheck, build,
+  lint, 34 tests) after both fixes. Verified live in Chrome at 390×844:
+  screenshots confirm the card sits tight above the Moon at rest, visibly
+  shrinks/drifts to centre during fade-out, and is completely absent (not
+  just faint) on the title screen and on Vega. Spot-checked 1920×1080 —
+  `.identity-mobile` computed `display: none` throughout, unaffected.
 - [x] Widened the mobile identity card and replaced its fixed-position
   crossfade with the same "attach to the object" mechanism desktop's
   measurement cards already use — Matt's explicit feedback after reviewing
