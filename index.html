@@ -24,11 +24,34 @@
         <div class="stage">
           <div class="starfield" data-testid="starfield"></div>
           <div class="layers" data-testid="layers"></div>
+          <div class="ruler" data-testid="ruler">
+            <div class="ruler-segments" data-testid="ruler-segments"></div>
+            <div class="ruler-endcap" data-testid="ruler-endcap" aria-hidden="true"></div>
+            <input
+              type="range"
+              class="ruler-input"
+              data-testid="ruler-input"
+              min="0"
+              max="1"
+              step="0.0001"
+              aria-label="Scroll position along the depth track"
+            />
+          </div>
+          <div class="callouts" data-testid="callouts"></div>
           <div class="hud" data-testid="hud">
             <p class="hud-name" data-testid="hud-name"></p>
             <p class="hud-distance" data-testid="hud-distance"></p>
             <p class="hud-lookback" data-testid="hud-lookback"></p>
-            <p class="hud-anchor" data-testid="hud-anchor"></p>
+            <button
+              type="button"
+              class="hud-anchor-reveal"
+              data-testid="hud-anchor-reveal"
+              aria-expanded="false"
+              aria-controls="hud-anchor"
+            >
+              What does that mean?
+            </button>
+            <p class="hud-anchor" id="hud-anchor" data-testid="hud-anchor"></p>
           </div>
         </div>
       </div>

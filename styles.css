@@ -1,5 +1,8 @@
 :root {
   color-scheme: dark;
+
+  --wall-color: #fff2d9; /* echoes the CMB's ~3000K blackbody glow */
+  --ruler-height: min(60vh, 28rem);
 }
 
 * {
@@ -153,7 +156,227 @@ nav a {
 .hud-anchor {
   font-style: italic;
   opacity: 0.85;
+  margin: 0.5rem 0 0;
+}
+
+/* Moon/Sun gate their anchor fact behind a reveal button (see main.ts
+   wireReveal); every other waypoint has no `.gated` class and stays
+   always-visible, unchanged from before this feature existed. */
+.hud-anchor.gated:not(.revealed) {
+  display: none;
+}
+
+.hud-anchor-reveal,
+.callout-anchor-reveal {
+  font: inherit;
+  font-size: 0.85rem;
+  color: inherit;
+  background: rgb(255 255 255 / 12%);
+  border: none;
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+}
+
+.hud-anchor-reveal:hover,
+.callout-anchor-reveal:hover {
+  background: rgb(255 255 255 / 20%);
+}
+
+/* On desktop, a waypoint with its own diegetic callout (see `.callouts`
+   below) uses that instead of the fixed HUD; on phone the HUD stays the
+   one constant instrument panel regardless — this rule only fires
+   above the 768px breakpoint. */
+@media (width >= 768px) {
+  .hud.hud-suppressed {
+    display: none;
+  }
+}
+
+/* Depth ruler: equal-length segment per waypoint (see ruler.ts), not
+   true-to-scale — real lookback times span ten orders of magnitude, so a
+   proportional ruler would collapse everything but the last segment to
+   nothing. The native <input type="range"> overlaying `.ruler-segments`
+   is both the draggable position marker (no separate marker element) and
+   a free keyboard-operable control (arrows/Home/End). */
+.ruler {
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ruler-segments {
+  position: relative;
+  height: var(--ruler-height);
+  width: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgb(255 255 255 / 12%);
+}
+
+.ruler-segment {
+  flex: 1 1 0%;
+  border-bottom: 1px solid rgb(255 255 255 / 15%);
+  font-size: 0;
+}
+
+.ruler-segment:last-child {
+  border-bottom: none;
+}
+
+.ruler-endcap {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--wall-color);
+  box-shadow: 0 0 0.6rem var(--wall-color);
+  flex-shrink: 0;
+}
+
+.ruler-input {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: var(--ruler-height);
+  width: 1.5rem;
+  writing-mode: vertical-lr;
+  appearance: none;
+  background: transparent;
   margin: 0;
+  cursor: pointer;
+}
+
+.ruler-input::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+.ruler-input::-moz-range-track {
+  background: transparent;
+}
+
+.ruler-input::-webkit-slider-thumb {
+  appearance: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: #f5f5f7;
+  box-shadow: 0 0 0.4rem rgb(0 0 0 / 40%);
+  cursor: pointer;
+}
+
+.ruler-input::-moz-range-thumb {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: none;
+  border-radius: 50%;
+  background: #f5f5f7;
+  cursor: pointer;
+}
+
+@media (width <= 767px) {
+  :root {
+    --ruler-height: min(55vh, 24rem);
+  }
+
+  .ruler {
+    right: 0.75rem;
+  }
+}
+
+/* Diegetic callouts: Moon/Sun only this slice (see CALLOUT_OFFSETS in
+   main.ts) — the desktop-only layer that replaces the fixed HUD for
+   waypoints that have one. Position tracks the object's live on-screen
+   offset via --callout-x/-y (written every frame in render()), which is
+   what lets this stay viewport-agnostic while this media query decides
+   whether it's shown at all — no !important fights with `.hud`. */
+.callouts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.callout {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(var(--callout-x, 0), var(--callout-y, 0));
+  max-width: 14rem;
+  padding: 0.75rem 1rem;
+  background: rgb(5 5 10 / 65%);
+  border-radius: 0.5rem;
+  pointer-events: auto;
+}
+
+.callout-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.15rem;
+}
+
+.callout-distance {
+  opacity: 0.7;
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+}
+
+.callout-lookback {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.callout-anchor {
+  font-style: italic;
+  opacity: 0.85;
+  margin: 0.5rem 0 0;
+}
+
+.callout-anchor:not(.revealed) {
+  display: none;
+}
+
+/* Static local geometry set once at init from CALLOUT_OFFSETS — the dog-leg
+   points back from the callout card's own corner toward the object, so it
+   never needs recomputing per scroll frame. */
+.callout-leader-h,
+.callout-leader-v {
+  position: absolute;
+  background: rgb(255 255 255 / 35%);
+}
+
+.callout-leader-h {
+  top: 0;
+  height: 2px;
+}
+
+.callout-leader-v {
+  top: 0;
+  width: 2px;
+}
+
+@media (width <= 767px) {
+  .callouts {
+    display: none;
+  }
+}
+
+/* Scoped to `.track` being in view (toggled in main.ts render()) so
+   `.hook`/`.payoff`, where the ruler has no meaning, keep a normal
+   scrollbar — native wheel/touch/keyboard scroll stays the only real
+   navigation mechanism throughout; this only hides its visual chrome. */
+html.track-visible {
+  scrollbar-width: none;
+}
+
+html.track-visible::-webkit-scrollbar {
+  display: none;
 }
 
 .payoff {
