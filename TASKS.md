@@ -8,14 +8,13 @@ see `CLAUDE.md`.
 - [ ] Mobile regression pass: resize mid-scroll, touch-drag ruler thumb,
   flick-scroll; re-screenshot desktop at fixed progress points to confirm
   pixel-identical to the pre-mobile-work baseline.
-- [ ] `pnpm check:evidence` + linkinator, all green (full `pnpm check`
-  already green through the CMB, all 12 waypoints).
-- [ ] `PROCESS.md` (400–600 words, 3–4 cited moments) and
-  `reflections/assignment-1.md` (150–300 words).
 - [ ] `/ship`, then verify the live URL at both viewports.
 
 ## Done (collapsed)
 
+- [x] `pnpm check:evidence` + linkinator, both green.
+- [x] Filled out `PROCESS.md` (3 cited moments) and
+  `reflections/assignment-1.md` — `0640782`, `32c89e8`.
 - [x] Fact-checked all waypoint numbers and anchors — see `PLAN.md`.
 - [x] First proof slice (discrete IntersectionObserver fade-ins) — rejected
   as reading like a slideshow; superseded by the continuous zoom rebuild.
