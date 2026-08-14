@@ -172,9 +172,9 @@ const identityMobileText = document.querySelector<HTMLElement>('[data-testid="id
 // object to clear but fill the same screen area, so they use the same -250.
 const MOBILE_IDENTITY_OFFSETS: Record<string, { x: number; y: number }> = {
   moon: { x: 0, y: -180 },
-  sun: { x: 0, y: -180 },
-  "proxima-centauri": { x: 0, y: -180 },
-  vega: { x: 0, y: -180 },
+  sun: { x: 0, y: -200 },
+  "proxima-centauri": { x: 0, y: -200 },
+  vega: { x: 0, y: -200 },
   "sagittarius-a": { x: 0, y: -250 },
   andromeda: { x: 0, y: -250 },
   "virgo-cluster": { x: 0, y: -250 },
@@ -419,16 +419,37 @@ if (track && layersEl) {
     }
 
     if (identityMobileEl && identityMobileText) {
-      const state = stateMap.get(current.id);
-      const offset = MOBILE_IDENTITY_OFFSETS[current.id];
+      // Driven by whichever waypoint is currently most opaque, not by
+      // `current` (currentWaypoint's own switch-over point sits past a new
+      // waypoint's fade-in — see its `from` in schedule.ts, the midpoint of
+      // fadeInEnd and convergeEnd, both after opacity has already reached 1)
+      // — gating on `current` meant only the very first waypoint (already
+      // `current` by default from progress 0) ever showed its fade-in; every
+      // other waypoint's card would sit hidden through the entrance, showing
+      // only the outgoing card's fade-out, then snap straight to full opacity
+      // the instant `current` flipped. Tracking live opacity instead makes
+      // the shared card follow whichever waypoint's own entrance/exit ramp is
+      // currently on top, so every waypoint's fade-in is visible, not just
+      // the first one.
+      let bestId: string | null = null;
+      let bestState: LayerState | null = null;
+      let bestOpacity = 0;
+      for (const id of Object.keys(MOBILE_IDENTITY_OFFSETS)) {
+        const candidate = stateMap.get(id);
+        if (candidate && candidate.opacity > bestOpacity) {
+          bestOpacity = candidate.opacity;
+          bestId = id;
+          bestState = candidate;
+        }
+      }
+      const waypoint = bestId ? staged.find((w) => w.id === bestId) : undefined;
+      const state = bestState;
+      const offset = bestId ? MOBILE_IDENTITY_OFFSETS[bestId] : undefined;
       const visible =
-        Boolean(offset) &&
-        Boolean(current.whatIsIt) &&
-        (state?.opacity ?? 0) > 0.01 &&
-        progress < SITE_SCHEDULE.hudExitStart;
+        Boolean(offset) && Boolean(waypoint?.whatIsIt) && bestOpacity > 0.01 && progress < SITE_SCHEDULE.hudExitStart;
       identityMobileEl.hidden = !visible;
       if (visible && state && offset) {
-        identityMobileText.textContent = current.whatIsIt ?? "";
+        identityMobileText.textContent = waypoint?.whatIsIt ?? "";
         identityMobileEl.style.opacity = String(state.opacity);
         // Scale the offset itself by the object's own opacity: at full opacity
         // the card sits fully clear of the image, but as opacity fades toward

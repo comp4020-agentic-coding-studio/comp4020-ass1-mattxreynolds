@@ -116,6 +116,34 @@ see `CLAUDE.md`.
   during the Moon→Sun transition, and stays hidden on every other waypoint.
   Spot-checked 1920×1080 — `display: none` confirmed computed, no visual
   change from the pre-existing desktop layout.
+- [x] Two follow-up fixes after Matt reviewed the full 12-waypoint rollout
+  live. (1) Every waypoint but the Moon was popping its identity card in at
+  full opacity instead of fading it in, while fade-outs all looked correct —
+  root cause: the shared `identityMobileEl` was driven by `currentWaypoint`,
+  whose own switch-over point (`from` in schedule.ts) is the midpoint of
+  `fadeInEnd` and `convergeEnd` — both *after* a sibling/field-reveal
+  entrance's opacity ramp already finishes at `fadeInEnd`. Moon only looked
+  right because it's `current` by default from progress 0, so it tracks its
+  own opacity from the very start; every other waypoint stayed hidden
+  through its entire fade-in (showing only the outgoing card's fade-out)
+  then snapped to opacity 1 the instant `current` flipped. Fixed by driving
+  the card from whichever waypoint has the highest live opacity each frame
+  instead of `current` — this crossfades naturally (the outgoing card dips
+  as the incoming one rises) and makes every waypoint's fade-in visible, not
+  just the first. (2) Moved the card a little higher at rest for sun,
+  proxima-centauri, and vega only (Matt's explicit per-waypoint call, not
+  Moon): `y` -180 → -200 for those three, reducing the numeric box overlap
+  with the image (Sun/Vega ~-27px/-17px vs Moon's -47px, left as-is) to
+  where screenshots show clean visual clearance. `pnpm check` green
+  (typecheck, build, lint, 34 tests). Verified live in Chrome at 390×844: an
+  opacity scrub through each of Sun/Proxima Centauri/Vega/Sagittarius A*'s
+  entrances confirms a continuous fade (dip-then-rise at the crossover, no
+  jump), a wider scrub confirms Moon's own fade-in (0→1 over ~p 0.024-0.044)
+  is unchanged, and screenshots of Sun/Proxima Centauri/Vega at rest confirm
+  the raised offset clears the image with no overlap. Spot-checked
+  1920×1080 across six progress points — `.identity-mobile` computed
+  `display: none` throughout, unaffected; re-confirmed Moon's own rest
+  screenshot unchanged from before this pass.
 - [x] Rolled the mobile identity card out to the remaining 11 waypoints.
   `MOBILE_IDENTITY_OFFSETS` (`main.ts`) now covers all 12 ids (the same set
   as desktop's `CARD_OFFSETS`/`HAS_CARD_IDS`), grouped by the image's own
