@@ -156,33 +156,30 @@ const identityMobileText = document.querySelector<HTMLElement>('[data-testid="id
 
 // Mobile-only "what is this?" card: desktop's identity tooltip only appears
 // on hover (see wireIdentityHover), which doesn't exist on touch, so mobile
-// gets its own always-rendered card instead. Offset (px, from the object's
-// own live screen-space centre) works exactly like CARD_OFFSETS — consumed
-// via the object's live x/y/scale transform, not a static screen position —
-// so the card "attaches" to the image: it slides in from the same side and
-// grows/shrinks the same way, at Matt's request, rather than fading in place.
-// x stays 0 for every waypoint (the card sits centred above the image, so it
-// sways with the same live sibling-entrance sweep the image itself gets,
-// rather than needing its own per-waypoint side). y is grouped by the
-// image's own rendered mobile size (see styles.css's `.layer img` rules): the
-// four sibling-body waypoints sized by the base clamp (~224px tall on a
-// 390px-wide phone) get the Moon's proven -180; the six field/point-source
-// waypoints bumped to `min(92vw, cap)` on mobile (~359px tall) get a larger
-// -250 to clear that bigger footprint; the fog/CMB veils have no discrete
-// object to clear but fill the same screen area, so they use the same -250.
-const MOBILE_IDENTITY_OFFSETS: Record<string, { x: number; y: number }> = {
-  moon: { x: 0, y: -180 },
-  sun: { x: 0, y: -200 },
-  "proxima-centauri": { x: 0, y: -200 },
-  vega: { x: 0, y: -200 },
-  "sagittarius-a": { x: 0, y: -250 },
-  andromeda: { x: 0, y: -250 },
-  "virgo-cluster": { x: 0, y: -250 },
-  "3c273": { x: 0, y: -250 },
-  "gn-z11": { x: 0, y: -250 },
-  "jades-gs-z14-0": { x: 0, y: -250 },
-  "reionization-fog": { x: 0, y: -250 },
-  cmb: { x: 0, y: -250 },
+// gets its own always-rendered card instead. Rest offset (px, above the
+// object's own screen-space centre) is grouped by the image's own rendered
+// mobile size (see styles.css's `.layer img` rules): the four sibling-body
+// waypoints sized by the base clamp (~224px tall on a 390px-wide phone) get
+// the Moon's proven -180; the six field/point-source waypoints bumped to
+// `min(92vw, cap)` on mobile (~359px tall) get a larger -250 to clear that
+// bigger footprint; the fog/CMB veils have no discrete object to clear but
+// fill the same screen area, so they use the same -250. The card no longer
+// tracks the object's own live x/y sweep (see render()) — it sinks into /
+// grows out of the bottom edge of the screen instead, so only a single rest
+// y-offset is needed, not a per-waypoint side.
+const MOBILE_IDENTITY_OFFSETS: Record<string, number> = {
+  moon: -180,
+  sun: -200,
+  "proxima-centauri": -200,
+  vega: -200,
+  "sagittarius-a": -250,
+  andromeda: -250,
+  "virgo-cluster": -250,
+  "3c273": -250,
+  "gn-z11": -250,
+  "jades-gs-z14-0": -250,
+  "reionization-fog": -250,
+  cmb: -250,
 };
 
 // `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint
@@ -464,23 +461,33 @@ if (track && layersEl) {
       }
       const waypoint = bestId ? staged.find((w) => w.id === bestId) : undefined;
       const state = bestState;
-      const offset = bestId ? MOBILE_IDENTITY_OFFSETS[bestId] : undefined;
+      const restOffset = bestId ? MOBILE_IDENTITY_OFFSETS[bestId] : undefined;
       const visible =
-        Boolean(offset) && Boolean(waypoint?.whatIsIt) && bestOpacity > 0.01 && progress < SITE_SCHEDULE.hudExitStart;
+        restOffset !== undefined &&
+        Boolean(waypoint?.whatIsIt) &&
+        bestOpacity > 0.01 &&
+        progress < SITE_SCHEDULE.hudExitStart;
       identityMobileEl.hidden = !visible;
-      if (visible && state && offset) {
+      if (visible && state && restOffset !== undefined) {
         identityMobileText.textContent = waypoint?.whatIsIt ?? "";
         identityMobileEl.style.opacity = String(state.opacity);
-        // Scale the offset itself by the object's own opacity: at full opacity
-        // the card sits fully clear of the image, but as opacity fades toward
-        // 0 (entering or exiting) the offset fades toward 0 too, so the card
-        // converges onto the object's own position instead of just shrinking
-        // in place at a fixed spot while everything around it moves.
-        const px = (state.x / 100) * window.innerWidth + offset.x * state.opacity;
-        const py = (state.y / 100) * window.innerHeight + offset.y * state.opacity;
-        identityMobileEl.style.setProperty("--identity-x", `${px}px`);
+        // Sinks into / grows out of the bottom edge of the screen with its
+        // own object's fade, rather than converging onto the object's own
+        // position — Matt's explicit request: the outgoing card should
+        // shrink and disappear downward as its image fades out, and the next
+        // one should reverse that, growing up out of the bottom as it fades
+        // in. Blend between the rest position (fully clear above the image,
+        // at opacity 1) and a point below the fold (at opacity 0) using the
+        // object's own live opacity.
+        const restPy = (state.y / 100) * window.innerHeight + restOffset;
+        const exitPy = window.innerHeight * 0.55;
+        const py = exitPy + (restPy - exitPy) * state.opacity;
+        identityMobileEl.style.setProperty("--identity-x", "0px");
         identityMobileEl.style.setProperty("--identity-y", `${py}px`);
-        identityMobileEl.style.setProperty("--identity-scale", String(dampedScale(state.scale)));
+        // Shrink/grow in step with the same opacity blend so it reads as
+        // sinking away to nothing / growing up from nothing, not just
+        // sliding at a fixed size.
+        identityMobileEl.style.setProperty("--identity-scale", String(dampedScale(state.scale) * state.opacity));
       }
     }
 

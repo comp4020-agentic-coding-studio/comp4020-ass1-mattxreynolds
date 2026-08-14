@@ -471,22 +471,19 @@ nav a {
   /* Small floating card in the blank space between the ruler and the image
      (Matt's explicit call over a full-width top sheet) — same visual
      language as the desktop hover card (compact, translucent, rounded)
-     rather than the bottom sheet's full-width treatment. Tracks the
-     object's own live x/y/scale transform (--identity-x/-y/-scale, set
-     every frame in render() from the same state used for the layer itself)
-     rather than sitting at a fixed screen position, so it "attaches" to the
-     image — sliding in from the same side and growing/shrinking with it,
-     not just fading in place. Unlike the desktop `.callout` cards (which
-     use large asymmetric offsets to clear the image and never need
-     centring), this one needs to stay centred over the image at rest, so
-     it needs its own -50%/-50% self-centring baked into the transform on
-     top of that offset — an explicit `width` rather than `max-width` is
-     required for this to render correctly: an auto-width box anchored at
-     `left: 50%` gets its shrink-to-fit width silently capped to the
-     remaining half of the container (a real, if obscure, quirk of the CSS
-     auto-width algorithm), which pinned it to the right half of the
-     viewport instead of centring it until this was found and fixed.
-     `:not([hidden])` matters here — see the base rule above. */
+     rather than the bottom sheet's full-width treatment. --identity-y/-scale
+     (set every frame in render()) blend between the card's rest position
+     above the image and a point below the fold as the object's own opacity
+     fades, so it sinks into / grows out of the bottom of the screen with its
+     own image's fade rather than just fading in place; --identity-x is
+     always 0, the card stays horizontally centred. An explicit `width`
+     rather than `max-width` is required for the centring transform below to
+     render correctly: an auto-width box anchored at `left: 50%` gets its
+     shrink-to-fit width silently capped to the remaining half of the
+     container (a real, if obscure, quirk of the CSS auto-width algorithm),
+     which pinned it to the right half of the viewport instead of centring it
+     until this was found and fixed. `:not([hidden])` matters here — see the
+     base rule above. */
   .identity-mobile:not([hidden]) {
     display: block;
     position: absolute;

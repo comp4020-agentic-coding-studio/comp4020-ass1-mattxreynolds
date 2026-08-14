@@ -94,6 +94,30 @@ see `CLAUDE.md`.
   (typecheck, build, lint, 34 tests). Verified live in Chrome at 390×844
   across all 6 affected waypoints plus CMB — all settle within the
   viewport with margin, no cropping. See `a3d9583`.
+- [x] Matt: the mobile identity card should shrink and sink into the bottom
+  of the screen as its own image fades out, and the next waypoint's card
+  should reverse that — fade in while growing up out of the bottom — rather
+  than converging onto the object's own position as it fades (the prior
+  "attach to the object" behaviour). Dropped `MOBILE_IDENTITY_OFFSETS`'
+  unused `x` field (always 0, no longer needed once the card stopped
+  tracking the object's own horizontal sweep) down to a plain per-id rest
+  y-offset. In render(), `--identity-y` now blends between that rest offset
+  (opacity 1) and a fixed point below the fold, `window.innerHeight * 0.55`
+  (opacity 0), using the card's own live opacity; `--identity-scale`
+  multiplies `dampedScale(state.scale)` by that same opacity so the shrink/
+  grow reads as coming from nothing at the bottom, not just sliding at a
+  fixed size. `--identity-x` is now always `0px` (no more per-waypoint
+  side). `pnpm check` green (typecheck, build, lint, 34 tests). Verified
+  live in Chrome at 390×844 across the Moon→Sun transition: an opacity/
+  transform scan shows Moon's card shrinking and translating downward as
+  its opacity drops (e.g. scale 0.36→0.20→0.16, ty 102→217→302 as opacity
+  falls 0.49→0.31→0.14), then Sun's own card growing back up from the same
+  region as its opacity rises; screenshots confirm the card is essentially
+  invisible at Sun's low-opacity entrance and reads as "emerging from the
+  bottom" by mid-fade. Confirmed hidden throughout the title screen and
+  closing (p=0, 0.95, 1.0). Spot-checked 1920×1080 across four progress
+  points — `.identity-mobile` computed `display: none` throughout,
+  unaffected.
 - [x] Fixed the mobile HUD showing "The Moon" at the bottom of the title
   screen. Root cause: `currentWaypoint` (`zoom.ts`) defaults `current` to
   `staged[0]` (Moon) from progress 0 — before Moon's own entrance has even
