@@ -3,19 +3,63 @@
 Small rolling working set. Collapse to one line + commit link once done —
 see `CLAUDE.md`.
 
-## Current
-
+## Next
+- [ ] Ruler: un-hide `unitRegime` segment labels (currently `font-size: 0`
+  under an `aria-hidden` parent) + add progress dimming for past segments.
+- [ ] Hook: add one sentence on the finite-light-speed mechanism.
+- [ ] Decide mobile treatment for the two-card layout (deferred, not
+  assumed to be "the same, just smaller" — see PLAN.md).
 - [ ] Resize-mid-scroll check (not yet done — only fixed-viewport checks so
   far).
-
-## Next
-
 - [ ] `pnpm check:evidence` + linkinator, all green (full `pnpm check` is
   already green through the CMB, all 12 waypoints).
 - [ ] `PROCESS.md` (400–600 words, 3–4 cited moments) and
   `reflections/assignment-1.md` (150–300 words).
 - [ ] `/ship`, then verify the live URL at both viewports.
 
+- [x] Rolled out identity/measurement cards to the remaining 8 point-source
+  waypoints (Proxima Centauri → JADES-GS-z14-0). Derived a general offset
+  rule instead of reusing Moon/Sun's numbers (card x-side opposite the
+  waypoint's own entrance-sweep sign; y-sign alternating between every
+  adjacent pair; larger magnitude for the two field-reveal waypoints) — see
+  `PLAN.md`. `pnpm check` green (typecheck, build, lint, 26 tests). Verified
+  live in Chrome at 1920×1080: all 10 waypoints' settled states clean, plus
+  the two same-x-side adjacent crossfades (Sagittarius A*/Andromeda,
+  Virgo Cluster/3C 273) specifically checked for collision — none found.
+  Hover spot-checked on Proxima Centauri, both field-reveal waypoints
+  (Sagittarius A*, Virgo Cluster — different image shapes than the
+  sibling-body stars/galaxies), and JADES-GS-z14-0 — correct content, no
+  overlap. Spot-checked 390×844 on two of the new waypoints — HUD-only,
+  unchanged.
+- [x] Desktop identity/measurement card slice (Moon/Sun) — `pnpm check` green
+  (typecheck, build, lint, 26 tests). Verified live in Chrome at 1920×1080
+  (`agent-browser`, dev server): Moon settled + Sun entering large/offscreen
+  right shows both waypoints' cards with no overlap between them; Sun fully
+  settled shows its measurement/identity pair cleanly stacked opposite each
+  other with no clipping. Spot-checked 390×844 too (not required for this
+  slice, desktop-only) — callouts correctly stay hidden there, HUD unchanged.
+  Cleared to roll out to the remaining 8 waypoints.
+- [x] Matt: identity card should only appear on hover, at the cursor; move
+  the measurement card further out so it stops overlapping the image.
+  Converted identity card to a `position: fixed` cursor-following tooltip
+  (`wireIdentityHover` in `main.ts`, edge-aware so it never overflows the
+  viewport); force-hidden if the waypoint's opacity drops below the
+  visibility threshold so it can't stick open while scrolling past.
+  Retuned `CARD_OFFSETS` (Moon/Sun) so the measurement card fully clears the
+  image footprint instead of just its centre. Found and fixed a real bug
+  along the way: every waypoint's full-viewport `.layer` div was
+  hit-testable even while transparent, so the topmost one in DOM order
+  silently ate all hover/click events across the whole stage — fixed with
+  `pointer-events: none` on `.layer`, with only the actively-hoverable image
+  itself re-enabled per frame. Also found the measurement card's leader line
+  now crosses back over the (further-away) image and was itself blocking the
+  hover it should have no opinion about — fixed with `pointer-events: none`
+  on `.callout-leader-h`/`-v`. `pnpm check` green (typecheck, build, lint,
+  26 tests). Verified live in Chrome at 1920×1080: Moon and Sun hover both
+  trigger the tooltip at the cursor with correct content and no overlap;
+  measurement cards on both are clear of their images; scrolling past Sun
+  without moving the mouse correctly closes the tooltip rather than leaving
+  it stuck. Spot-checked 390×844 — unchanged, HUD-only as before.
 - [x] Matt: objects still too small on desktop; Moon design approved but
   Sun/Proxima Centauri star design disliked ("remove the sticks coming out,
   add more texture"). Fixed sizing at the CSS layer (`.layer svg` from fixed

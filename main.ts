@@ -15,20 +15,40 @@ import { uniformStarfield } from "./starfield";
 import { WAYPOINTS } from "./waypoints";
 import { clampProgress, currentWaypoint, interpLayer, type LayerFrame, type LayerState } from "./zoom";
 
-// Leader-line anchor offset (px, from the object's own screen-space centre)
-// for each waypoint's diegetic callout card — proof-slice scope is Moon/Sun
-// only; the rest keep the existing always-visible `.hud` block unchanged
-// until the pattern rolls out further. Moon was flipped from its original
-// +x (upper-right) to -x (upper-left): Moon itself never moves, but the Sun
-// sweeps in from the right (see LAYER_FRAMES.sun's positive entrance x), so
-// the old upper-right card sat directly in its path. Sun's own offset is
-// left as originally authored (lower-left) — flipping it too was tried and
-// reverted: the Sun's own entrance already pushes it far right (x up to
-// ~50vw), so a further-right card offset ran off the viewport edge before
-// the Sun even settled. Lower-left never overlapped anything observed.
-const CALLOUT_OFFSETS: Record<string, { x: number; y: number }> = {
-  moon: { x: -170, y: -130 },
-  sun: { x: -190, y: 140 },
+// Leader-line anchor offsets (px, from the object's own screen-space centre)
+// for each waypoint's measurement card (name/distance/lookback + gated
+// anchor) — the only card still positioned this way. The identity card ("what
+// is this") is a cursor-following hover tooltip instead (see
+// wireIdentityHover) — no fixed offset, no leader line, since it appears
+// wherever the cursor already is. Covers all 10 point-source waypoints
+// (Moon through JADES-GS-z14-0); reionization fog and the CMB stay on the
+// existing always-visible `.hud` block permanently.
+//
+// Offsets are tuned per waypoint on two axes, not a shared constant: (1)
+// clearing the object's own image entirely — large enough magnitude that the
+// card's box doesn't overlap the ~34vmin-wide image at rest, using the open
+// screen space instead of crowding the object — and (2) avoiding each
+// waypoint's own entrance sweep: every sibling-body waypoint's card sits on
+// the side opposite its own LAYER_FRAMES entrance x sign, since a same-side
+// card would sit directly in the path of (or run off-screen with) its own
+// oversized entrance. Field-reveal waypoints (sagittarius-a, virgo-cluster)
+// have no lateral entrance sweep to dodge, so their side just continues the
+// left/right alternation; their offset magnitude is larger to clear the
+// bigger oversized scale (2.6x vs 2.2x) they briefly hold at. Vertical sign
+// alternates between every adjacent pair (not tied to side) so no two
+// waypoints' cards can stack on each other during a crossfade even when they
+// land on the same side.
+const CARD_OFFSETS: Record<string, { x: number; y: number }> = {
+  moon: { x: -460, y: -130 },
+  sun: { x: -480, y: 140 },
+  "proxima-centauri": { x: 460, y: -130 },
+  vega: { x: -460, y: 140 },
+  "sagittarius-a": { x: 500, y: -150 },
+  andromeda: { x: 460, y: 150 },
+  "virgo-cluster": { x: -500, y: -150 },
+  "3c273": { x: -460, y: 140 },
+  "gn-z11": { x: 460, y: -130 },
+  "jades-gs-z14-0": { x: -460, y: 140 },
 };
 
 // A single click/tap listener drives every anchor-fact reveal (no hover) —
@@ -52,6 +72,34 @@ function wireReveal(trigger: HTMLButtonElement, content: HTMLElement) {
       apply();
     },
   };
+}
+
+// Identity card ("what is this") appears at the cursor while hovering the
+// waypoint's own image, rather than tracking scroll progress — `position:
+// fixed`, moved with mousemove, so it uses raw client coordinates directly.
+// Flips to the other side of the cursor if it would run off the viewport
+// edge, same idea as a standard tooltip.
+function wireIdentityHover(img: HTMLElement, card: HTMLElement) {
+  const margin = 20;
+  const place = (clientX: number, clientY: number) => {
+    const rect = card.getBoundingClientRect();
+    let x = clientX + margin;
+    let y = clientY + margin;
+    if (x + rect.width > window.innerWidth - margin) x = clientX - rect.width - margin;
+    if (y + rect.height > window.innerHeight - margin) y = clientY - rect.height - margin;
+    card.style.left = `${Math.max(margin, x)}px`;
+    card.style.top = `${Math.max(margin, y)}px`;
+  };
+  img.addEventListener("mouseenter", (event) => {
+    card.hidden = false;
+    place(event.clientX, event.clientY);
+  });
+  img.addEventListener("mousemove", (event) => {
+    place(event.clientX, event.clientY);
+  });
+  img.addEventListener("mouseleave", () => {
+    card.hidden = true;
+  });
 }
 
 // All 12 waypoints (Moon through the CMB) — build order complete, see
@@ -198,7 +246,25 @@ const rulerInput = document.querySelector<HTMLInputElement>('[data-testid="ruler
 const calloutsEl = document.querySelector<HTMLElement>('[data-testid="callouts"]');
 
 const staged = WAYPOINTS.filter((w) => w.from !== undefined && LAYER_FRAMES[w.id]);
-const GATED_IDS = new Set(Object.keys(CALLOUT_OFFSETS));
+const GATED_IDS = new Set(Object.keys(CARD_OFFSETS));
+
+// Shared by both callout kinds: position a card's static leader-line dog-leg
+// from its fixed offset (derived once here, not recomputed per frame).
+function positionLeaderLine(card: HTMLElement, offset: { x: number; y: number }) {
+  const leaderH = card.querySelector<HTMLElement>(".callout-leader-h");
+  const leaderV = card.querySelector<HTMLElement>(".callout-leader-v");
+  const dx = -offset.x;
+  const dy = -offset.y;
+  if (leaderH) {
+    leaderH.style.left = `${Math.min(0, dx)}px`;
+    leaderH.style.width = `${Math.abs(dx)}px`;
+  }
+  if (leaderV) {
+    leaderV.style.left = `${dx}px`;
+    leaderV.style.top = `${Math.min(0, dy)}px`;
+    leaderV.style.height = `${Math.abs(dy)}px`;
+  }
+}
 
 if (starfieldEl) {
   starfieldEl.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -232,17 +298,20 @@ if (track && layersEl) {
     rulerSegmentsEl.setAttribute("aria-hidden", "true");
   }
 
-  // Diegetic callouts: Moon/Sun only this slice (see CALLOUT_OFFSETS). Each
-  // card's own leader-line dog-leg is static local geometry — derived once
-  // here from the fixed offset, not recomputed per frame — while the card
-  // itself is repositioned every frame in render() via --callout-x/-y to
-  // track the object's live entrance/exit motion.
+  // Diegetic callouts: Moon/Sun only this slice (see CARD_OFFSETS). The
+  // measurement card's leader-line dog-leg is static local geometry — derived
+  // once here from the fixed offset, not recomputed per frame — while the
+  // card itself is repositioned every frame in render() via --callout-x/-y to
+  // track the object's live entrance/exit motion. The identity card has no
+  // leader line and isn't scroll-positioned at all — see wireIdentityHover.
   const calloutEls = new Map<string, HTMLElement>();
   const calloutReveals = new Map<string, ReturnType<typeof wireReveal>>();
+  const identityCardEls = new Map<string, HTMLElement>();
   if (calloutsEl) {
     for (const waypoint of staged) {
-      const offset = CALLOUT_OFFSETS[waypoint.id];
+      const offset = CARD_OFFSETS[waypoint.id];
       if (!offset) continue;
+
       const callout = document.createElement("div");
       callout.className = "callout";
       callout.dataset.id = waypoint.id;
@@ -256,19 +325,7 @@ if (track && layersEl) {
         <button type="button" class="callout-anchor-reveal" aria-expanded="false">What does that mean?</button>
         <p class="callout-anchor">${waypoint.anchor}</p>
       `;
-      const leaderH = callout.querySelector<HTMLElement>(".callout-leader-h");
-      const leaderV = callout.querySelector<HTMLElement>(".callout-leader-v");
-      const dx = -offset.x;
-      const dy = -offset.y;
-      if (leaderH) {
-        leaderH.style.left = `${Math.min(0, dx)}px`;
-        leaderH.style.width = `${Math.abs(dx)}px`;
-      }
-      if (leaderV) {
-        leaderV.style.left = `${dx}px`;
-        leaderV.style.top = `${Math.min(0, dy)}px`;
-        leaderV.style.height = `${Math.abs(dy)}px`;
-      }
+      positionLeaderLine(callout, offset);
       const revealBtn = callout.querySelector<HTMLButtonElement>(".callout-anchor-reveal");
       const anchorP = callout.querySelector<HTMLElement>(".callout-anchor");
       if (revealBtn && anchorP) {
@@ -276,6 +333,26 @@ if (track && layersEl) {
       }
       calloutsEl.appendChild(callout);
       calloutEls.set(waypoint.id, callout);
+
+      // Identity card: hover-triggered tooltip over the waypoint's own image,
+      // positioned at the cursor — core information, not the
+      // relatable-comparison flourish the gated anchor is, so no gate, but
+      // also no need to compete for permanent on-screen space. Only rendered
+      // where whatIsIt exists.
+      const img = layerEls.get(waypoint.id)?.querySelector("img");
+      if (waypoint.whatIsIt && img) {
+        const identityCard = document.createElement("div");
+        identityCard.className = "callout callout-identity";
+        identityCard.dataset.id = waypoint.id;
+        identityCard.hidden = true;
+        identityCard.innerHTML = `
+          <p class="callout-identity-label">What is this?</p>
+          <p class="callout-identity-text">${waypoint.whatIsIt}</p>
+        `;
+        calloutsEl.appendChild(identityCard);
+        identityCardEls.set(waypoint.id, identityCard);
+        wireIdentityHover(img, identityCard);
+      }
     }
   }
 
@@ -314,6 +391,24 @@ if (track && layersEl) {
       stateMap.set(waypoint.id, state);
       layer.style.transform = `translate(${state.x}vw, ${state.y}vh) scale(${state.scale})`;
       layer.style.opacity = String(state.opacity);
+
+      // Hover only hits an image once it's actually visible — otherwise a
+      // transparent, off-held waypoint sitting at the same screen position
+      // (e.g. mid-crossfade) could silently swallow the hover meant for its
+      // neighbour.
+      const identityCard = identityCardEls.get(waypoint.id);
+      if (identityCard) {
+        const img = layer.querySelector<HTMLElement>("img");
+        const hoverable = state.opacity > 0.01;
+        if (img) {
+          img.style.pointerEvents = hoverable ? "auto" : "none";
+          img.style.cursor = hoverable ? "help" : "";
+        }
+        // If the object fades away while its tooltip is still open (e.g. the
+        // user scrolls on without moving the mouse), force it closed rather
+        // than leaving a stale card floating over the next waypoint.
+        if (!hoverable && !identityCard.hidden) identityCard.hidden = true;
+      }
     }
 
     const gated = GATED_IDS.has(current.id);
@@ -332,19 +427,22 @@ if (track && layersEl) {
     // snapping visible/hidden on the coarse current-waypoint cutover — this
     // is what stops Moon's card sitting at full strength while Sun is
     // already substantially faded in (and vice versa on the way out).
-    for (const [id, callout] of calloutEls) {
-      const state = stateMap.get(id);
-      const offset = CALLOUT_OFFSETS[id];
-      if (!state || !offset) continue;
+    const positionCard = (card: HTMLElement, state: LayerState, offset: { x: number; y: number }) => {
       const visible = state.opacity > 0.01;
-      callout.hidden = !visible;
+      card.hidden = !visible;
       if (visible) {
-        callout.style.opacity = String(state.opacity);
+        card.style.opacity = String(state.opacity);
         const px = (state.x / 100) * window.innerWidth + offset.x;
         const py = (state.y / 100) * window.innerHeight + offset.y;
-        callout.style.setProperty("--callout-x", `${px}px`);
-        callout.style.setProperty("--callout-y", `${py}px`);
+        card.style.setProperty("--callout-x", `${px}px`);
+        card.style.setProperty("--callout-y", `${py}px`);
       }
+    };
+    for (const [id, callout] of calloutEls) {
+      const state = stateMap.get(id);
+      const offset = CARD_OFFSETS[id];
+      if (!state || !offset) continue;
+      positionCard(callout, state, offset);
     }
 
     if (rulerInput) {

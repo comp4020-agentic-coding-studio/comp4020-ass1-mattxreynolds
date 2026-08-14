@@ -101,6 +101,12 @@ nav a {
   align-items: center;
   justify-content: center;
   transform-origin: 50% 50%;
+
+  /* Every waypoint's layer is full-stage-sized and stacked, so without this
+     the topmost one in DOM order would intercept hover/clicks across the
+     whole stage even where it's fully transparent. Only the image itself
+     (see below) re-enables pointer-events, and only while hoverable. */
+  pointer-events: none;
 }
 
 .layer svg,
@@ -109,6 +115,11 @@ nav a {
   height: clamp(12rem, 34vmin, 26rem);
   object-fit: contain;
   filter: drop-shadow(0 0 2rem rgb(255 255 255 / 15%));
+
+  /* Off by default; main.ts turns this on per-frame only for waypoints with
+     an identity hover tooltip, and only while the image is actually visible
+     (see wireIdentityHover / the render() loop). */
+  pointer-events: none;
 }
 
 /* The fog is the one waypoint meant to blot out the whole view, not sit
@@ -291,12 +302,16 @@ nav a {
   }
 }
 
-/* Diegetic callouts: Moon/Sun only this slice (see CALLOUT_OFFSETS in
+/* Diegetic callouts: Moon/Sun only this slice (see CARD_OFFSETS in
    main.ts) — the desktop-only layer that replaces the fixed HUD for
-   waypoints that have one. Position tracks the object's live on-screen
-   offset via --callout-x/-y (written every frame in render()), which is
-   what lets this stay viewport-agnostic while this media query decides
-   whether it's shown at all — no !important fights with `.hud`. */
+   waypoints that have one. The measurement card's position tracks the
+   object's live on-screen offset via --callout-x/-y (written every frame in
+   render()), which is what lets this stay viewport-agnostic while this media
+   query decides whether it's shown at all — no !important fights with
+   `.hud`. Each waypoint with cards renders the always-visible measurement
+   card (name/distance/lookback + gated anchor), pushed clear of the image
+   into open screen space, and, where `whatIsIt` exists, an identity card
+   (`.callout-identity` modifier, see below) that only appears on hover. */
 .callouts {
   position: absolute;
   inset: 0;
@@ -338,17 +353,52 @@ nav a {
   margin: 0.5rem 0 0;
 }
 
+/* Identity card: a hover tooltip, not a scroll-tracked callout — see
+   wireIdentityHover in main.ts. Fixed to the viewport and positioned at the
+   cursor in JS (left/top set directly, not --callout-x/-y), so it overrides
+   `.callout`'s stage-relative positioning entirely; no leader line, since it
+   appears right where the cursor already is. */
+.callout-identity {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: none;
+  pointer-events: none;
+}
+
+/* Distinct label typography from `.callout-name` so it doesn't read as a
+   repeated title; the description itself is plain body text like
+   `.callout-lookback`. */
+.callout-identity-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+  margin: 0 0 0.35rem;
+}
+
+.callout-identity-text {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
 .callout-anchor:not(.revealed) {
   display: none;
 }
 
-/* Static local geometry set once at init from CALLOUT_OFFSETS — the dog-leg
+/* Static local geometry set once at init from CARD_OFFSETS — the dog-leg
    points back from the callout card's own corner toward the object, so it
-   never needs recomputing per scroll frame. */
+   never needs recomputing per scroll frame. Now that cards sit further from
+   their object, the line's own length often crosses back over the image
+   itself — pointer-events: none so it never steals the hover that triggers
+   the identity tooltip (`.callout` re-enables auto for the card body, but
+   the line is a purely visual child, not an interactive one). */
 .callout-leader-h,
 .callout-leader-v {
   position: absolute;
   background: rgb(255 255 255 / 35%);
+  pointer-events: none;
 }
 
 .callout-leader-h {

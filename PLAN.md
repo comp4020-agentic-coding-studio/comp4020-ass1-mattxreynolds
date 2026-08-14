@@ -66,7 +66,93 @@ A fixed HUD overlay shows discrete state — name, distance, lookback label,
 anchor — for whichever waypoint's `from` progress-threshold the current
 `progress` has most recently crossed. That discrete mapping (progress →
 current waypoint) is what the spec test asserts against, not the raw
-transform math.
+transform math. On desktop, waypoints with diegetic callout cards (see below)
+replace the HUD entirely rather than showing alongside it.
+
+## Desktop info cards (rolled out to all 10 point-source waypoints)
+
+Per-waypoint info was previously four short strings (name, distance,
+lookback, one gated relatable-analogy) — thin, and missing the single most
+obviously-expected fact: what the object actually *is*. Fixed by splitting
+each waypoint's diegetic callout into two cards instead of one:
+
+- **Measurement card**: name, distance, lookback label, gated "What does
+  that mean?" relatable analogy. Always visible, positioned with a fixed
+  per-waypoint offset (`CARD_OFFSETS`) pushed clear of the object's image so
+  it doesn't overlap it.
+- **Identity card**: one factual "what is this" line (`Waypoint.whatIsIt`).
+  Originally always-visible like the measurement card; changed to a
+  hover-triggered tooltip (Matt: "only appear when the user hovers over the
+  image ... appear where the cursor is") — `position: fixed`, positioned at
+  the cursor via `wireIdentityHover` in `main.ts` (mouseenter/mousemove/
+  mouseleave on the waypoint's own `<img>`), edge-aware so it never overflows
+  the viewport. No leader line, since it appears where the cursor already
+  is. Force-hidden if the waypoint's opacity drops below the visibility
+  threshold, so it can't get stuck open while scrolling past without moving
+  the mouse.
+
+Applies to the 10 point-source waypoints (Moon through JADES-GS-z14-0), not
+reionization fog or the CMB — both stay on the fixed `.hud` permanently, not
+just for now: fog has no discrete object to anchor a leader-line to, and the
+CMB's meaning is already carried by `.payoff` immediately following it.
+
+**Measurement card offsets are per-waypoint tuned, not a shared constant.**
+The original assumption was that one diagonal offset pair could be reused
+everywhere, since every object settles dead-centre-of-stage before its held
+window (see `LAYER_FRAMES`). That's true at rest, but entrance sweeps break
+it: Moon's card had to move from the upper-right to the upper-left because
+the Sun sweeps in from the right (`LAYER_FRAMES.sun`'s positive entrance `x`)
+and a right-side card sat directly in its path; Sun's own card stays
+left-leaning because Sun's entrance already pushes it far right, and a
+further-right offset ran off the viewport edge before Sun settled. Offsets
+were retuned again (Matt: card was overlapping the image) to clear the
+object's rendered footprint entirely rather than just its centre point —
+Moon `-170,-130` → `-460,-130`, Sun `-190,140` → `-480,140` — using more of
+the open screen space either side.
+
+Rolled out to the remaining 8 waypoints using a general rule derived from the
+Moon/Sun precedent rather than reused numbers: each sibling-body waypoint's
+card sits on the side **opposite** its own `LAYER_FRAMES` entrance-sweep sign
+(dodges its own oversized entrance), and the vertical sign **alternates
+between every adjacent pair** regardless of which side each lands on — that's
+what lets two neighbours safely share an x-side (as e.g. Sagittarius A* and
+Andromeda, and Virgo Cluster and 3C 273, both do) without their cards
+colliding during a crossfade. The two field-reveal waypoints (Sagittarius A*,
+Virgo Cluster) have no lateral entrance to dodge, so their side just
+continues the left/right alternation implied by neighbours, with a larger
+offset magnitude (500 vs ~460) to clear their bigger peak oversized scale
+(2.6x vs 2.2x). Verified live in Chrome at 1920×1080 across all 10 waypoints'
+settled states plus the two same-side crossfade moments specifically (no
+collision in either); hover spot-checked on Proxima Centauri, both
+field-reveal waypoints, and JADES-GS-z14-0 — correct content, no overlap with
+the measurement card, edge-aware positioning holds. 390×844 spot-checked on
+two of the new waypoints — HUD-only, unchanged. The identity card itself
+needs no offset — it's a cursor-following hover tooltip, not part of this
+stacked-offset geometry (see above).
+
+Desktop-only for now (`.callouts` already hides under the 768px breakpoint);
+how this looks on mobile — a second stacked HUD section rather than a second
+floating card, most likely — is an explicit later decision.
+
+Data for all 10 point-source waypoints lives in `waypoints.ts` (`whatIsIt`
+field) and all 10 are wired into the card system (`CARD_OFFSETS` in
+`main.ts`).
+
+## Follow-up polish (planned, not yet built)
+
+- **Ruler labels**: each `.ruler-segment` already carries `unitRegime()` text
+  (seconds/years/millennia/…) but it's `font-size: 0` under an `aria-hidden`
+  parent — dead to everyone, sighted or screen-reader. Un-hide it visually so
+  the scale escalation reads directly off the ruler; leave the container
+  `aria-hidden` since the range input's own `aria-valuetext` already covers
+  the same information for screen readers.
+- **Ruler progress dimming**: segments already scrolled past should dim
+  relative to what's ahead, so the ruler reads as "how much further," not
+  just "where."
+- **Hook mechanism sentence**: `.hook` currently asserts "everything you see
+  is already the past" without explaining why. Add one sentence on finite
+  light speed as the actual mechanism after the existing paragraph — keep it
+  to one sentence so the hook stays tight.
 
 The track ends once the last built waypoint has settled, then ordinary
 document flow continues into a short closing section — no hard scroll-stop.
