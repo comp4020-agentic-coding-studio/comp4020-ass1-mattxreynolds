@@ -206,6 +206,15 @@ nav a {
   margin: 0.5rem 0 0;
 }
 
+/* Structural wrappers shared by every waypoint's HUD (see index.html), but
+   only `.hud-sheet` (mobile bottom-sheet proof-of-concept, Moon only for
+   now — see wireHudSheet in main.ts) gives them any layout of their own;
+   everywhere else they're plain blocks with no visual effect, identical to
+   the un-wrapped markup this replaced. */
+.hud-sheet-toggle {
+  display: none;
+}
+
 /* On desktop, a waypoint with its own diegetic callout (see `.callouts`
    below) uses that instead of the fixed HUD; on phone the HUD stays the
    one constant instrument panel regardless — this rule only fires
@@ -362,6 +371,68 @@ nav a {
 
   .ruler {
     right: 0.75rem;
+  }
+
+  /* Bottom-sheet proof-of-concept (Moon only, see HUD_SHEET_IDS in
+     main.ts): collapsed shows just name + distance as a full-width strip
+     pinned to the bottom edge; tap/click/Enter-Space on the summary row, or
+     a vertical swipe anywhere on the sheet, expands it to reveal the
+     lookback + anchor text beneath. Every other waypoint's HUD is
+     unaffected — this whole block only ever applies while `.hud-sheet` is
+     present. */
+  .hud.hud-sheet {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: none;
+    border-radius: 1rem 1rem 0 0;
+    padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .hud.hud-sheet .hud-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+
+  .hud.hud-sheet .hud-name {
+    margin: 0;
+  }
+
+  .hud.hud-sheet .hud-distance {
+    margin: 0 auto 0 0;
+  }
+
+  .hud.hud-sheet .hud-sheet-toggle {
+    display: block;
+    flex: none;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-right: 2px solid currentcolor;
+    border-bottom: 2px solid currentcolor;
+    opacity: 0.7;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+  }
+
+  .hud.hud-sheet.expanded .hud-sheet-toggle {
+    transform: rotate(-135deg);
+  }
+
+  .hud.hud-sheet .hud-detail {
+    display: grid;
+    grid-template-rows: 0fr;
+    margin-top: 0.5rem;
+    transition: grid-template-rows 0.25s ease;
+  }
+
+  .hud.hud-sheet .hud-detail-inner {
+    overflow: hidden;
+  }
+
+  .hud.hud-sheet.expanded .hud-detail {
+    grid-template-rows: 1fr;
   }
 }
 

@@ -48,10 +48,17 @@
           </div>
           <div class="callouts" data-testid="callouts"></div>
           <div class="hud" data-testid="hud">
-            <p class="hud-name" data-testid="hud-name"></p>
-            <p class="hud-distance" data-testid="hud-distance"></p>
-            <p class="hud-lookback" data-testid="hud-lookback"></p>
-            <p class="hud-anchor" data-testid="hud-anchor"></p>
+            <div class="hud-summary" data-testid="hud-summary">
+              <p class="hud-name" data-testid="hud-name"></p>
+              <p class="hud-distance" data-testid="hud-distance"></p>
+              <span class="hud-sheet-toggle" aria-hidden="true"></span>
+            </div>
+            <div class="hud-detail" data-testid="hud-detail">
+              <div class="hud-detail-inner">
+                <p class="hud-lookback" data-testid="hud-lookback"></p>
+                <p class="hud-anchor" data-testid="hud-anchor"></p>
+              </div>
+            </div>
           </div>
           <div class="layer layer-closing" data-testid="closing-layer">
             <p>
