@@ -238,6 +238,14 @@ nav a {
   }
 }
 
+/* Reaching the closing beat hides the HUD on every viewport, not just
+   desktop — without this, mobile (which has no diegetic callout to hand off
+   to) keeps showing the last waypoint's card frozen behind the closing
+   text forever. See hud-ended in main.ts. */
+.hud.hud-ended {
+  display: none;
+}
+
 /* Depth ruler: equal-length segment per waypoint (see ruler.ts), not
    true-to-scale — real lookback times span ten orders of magnitude, so a
    proportional ruler would collapse everything but the last segment to

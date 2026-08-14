@@ -414,7 +414,13 @@ if (track && layersEl) {
       hudAnchor.classList.toggle("gated", anchorGated);
     }
     if (hudAnchorReveal) hudAnchorReveal.hidden = !anchorGated;
-    if (hudEl) hudEl.classList.toggle("hud-suppressed", hasCard || progress >= SITE_SCHEDULE.hudExitStart);
+    if (hudEl) {
+      hudEl.classList.toggle("hud-suppressed", hasCard);
+      // Unlike hud-suppressed (a desktop-only concern: a diegetic callout has
+      // taken over), this is "we've reached the closing beat" — true on every
+      // viewport, so it can't ride the same desktop-gated CSS rule.
+      hudEl.classList.toggle("hud-ended", progress >= SITE_SCHEDULE.hudExitStart);
+    }
 
     // Each callout crossfades on its own object's own fade, rather than
     // snapping visible/hidden on the coarse current-waypoint cutover — this
