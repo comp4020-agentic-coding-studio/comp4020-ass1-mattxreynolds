@@ -53,10 +53,12 @@ history for the veil version.)
 **Fog → CMB timing (current):** the fog ramps up to full opacity, holds, then
 fades out exactly as the CMB fades in — a synchronised crossfade rather than
 a hard cut, so the wall is reached through dissolving fog rather than a jump
-cut. The CMB then holds at full opacity for the rest of the track, including
-into `.payoff` — it doesn't recede. The wall is the last thing on screen; the
-closing text arrives over it, not after a fade back to the ordinary dark
-background.
+cut. The CMB then holds at full opacity, then fades back **out** before the
+track ends (revised from an earlier version where it held forever) — the
+ending is the closing text alone on the ordinary dark background, not the
+text permanently overlaid on a wall that never leaves. The closing layer's
+own fade-in starts well before the CMB has fully gone (see above), so there's
+overlap rather than a hard cut to black.
 
 **Fog/CMB imagery (confirmed with Matt):** `reionization-fog.png` and
 `cmb.png` — the latter is the real Planck all-sky temperature-anisotropy map,
@@ -68,6 +70,24 @@ anchor — for whichever waypoint's `from` progress-threshold the current
 current waypoint) is what the spec test asserts against, not the raw
 transform math. On desktop, waypoints with diegetic callout cards (see below)
 replace the HUD entirely rather than showing alongside it.
+
+**Opening and closing are schedule slots, not standalone sections.** The
+former `.hook`/`.payoff` sections (ordinary in-flow HTML outside the zoom
+track) are gone. `title-layer` and `closing-layer` are now static markup
+inside `.stage` itself, driven by `LAYER_FRAMES.title`/`.closing` the same
+`interpLayer` way every real waypoint is — they just have no image and no
+distance/lookback data, so they sit outside the `staged`/HUD/ruler/callout
+machinery entirely. The title holds at a large resting scale over the ambient
+starfield, then scales *up* while fading out — deliberately the one exit that
+doesn't shrink like every other waypoint's, since the title is framed as
+nearer than everything else, so its exit reads as the camera pushing through
+it rather than it receding. The Moon's own entrance is timed to start well
+into that fade (~85% through), not concurrently with it. The closing layer
+mirrors this in reverse after the CMB: starts oversized and fades in while
+shrinking to its settled scale, arriving once the CMB has almost fully faded
+back out (~85% through its own fade-out) so there's a brief near-black beat
+before the text appears, rather than the two crossfading for their full
+length.
 
 ## Desktop info cards (rolled out to all 10 point-source waypoints)
 
@@ -155,26 +175,23 @@ for JADES-GS-z14-0 trimmed to drop a clause duplicating `whatIsIt` ("one of
 the first galaxies to ever form") now that both sit on the same
 always-visible card.
 
-## Follow-up polish (planned, not yet built)
+## Ruler (decided, built)
 
-- **Ruler labels**: each `.ruler-segment` already carries `unitRegime()` text
-  (seconds/years/millennia/…) but it's `font-size: 0` under an `aria-hidden`
-  parent — dead to everyone, sighted or screen-reader. Un-hide it visually so
-  the scale escalation reads directly off the ruler; leave the container
-  `aria-hidden` since the range input's own `aria-valuetext` already covers
-  the same information for screen readers.
-- **Ruler progress dimming**: segments already scrolled past should dim
-  relative to what's ahead, so the ruler reads as "how much further," not
-  just "where."
-- **Hook mechanism sentence**: `.hook` currently asserts "everything you see
-  is already the past" without explaining why. Add one sentence on finite
-  light speed as the actual mechanism after the existing paragraph — keep it
-  to one sentence so the hook stays tight.
+Segment labels (`unitRegime()` text — seconds/years/millennia/…) were
+un-hidden, then explored further (a grouped/bracketed variant merging
+same-label runs), then dropped entirely on review ("I don't think i like the
+labels for now") — the ruler ships as a bare segment bar with no text.
+**Progress dimming** (already-scrolled-past segments dim, current segment
+brightens, everything ahead stays at baseline) is the one thing from that
+pass that shipped: the ruler reads as "how much further," not "where," via
+brightness alone. The overflow/border-radius fix this work surfaced (corner
+rounding lives on the end segments, not a clipping parent) stays regardless
+of the labels decision — nothing else needs to render outside the bar's own
+narrow box today, but nothing should clip if it ever does.
 
-The track ends once the last built waypoint has settled, then ordinary
-document flow continues into a short closing section — no hard scroll-stop.
-The wall is what the CMB waypoint's content says, not an enforced inability
-to scroll further.
+The track ends once the last built waypoint (the CMB) has settled and faded
+back out, then the closing layer (see Core interaction above) is the last
+thing on screen — no hard scroll-stop, `progress` just clamps at 1.
 
 ## Scope
 

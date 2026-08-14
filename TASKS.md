@@ -4,7 +4,6 @@ Small rolling working set. Collapse to one line + commit link once done —
 see `CLAUDE.md`.
 
 ## Next
-- [ ] Hook: add one sentence on the finite-light-speed mechanism.
 - [ ] Decide mobile treatment for the two-card layout (deferred, not
   assumed to be "the same, just smaller" — see PLAN.md).
 - [ ] Resize-mid-scroll check (not yet done — only fixed-viewport checks so
@@ -15,6 +14,44 @@ see `CLAUDE.md`.
   `reflections/assignment-1.md` (150–300 words).
 - [ ] `/ship`, then verify the live URL at both viewports.
 
+- [x] Added `title`/`closing` bookend layers as schedule slots (no image,
+  outside the staged/HUD/ruler/callout machinery), replacing the standalone
+  `.hook`/`.payoff` sections. Title scales *up* while fading out (the one
+  exit that doesn't shrink — framed as nearer than everything else, so it
+  reads as the camera pushing through it); Moon's own entrance now starts
+  ~85% into that fade rather than concurrently. CMB now fades back out
+  before the track ends instead of holding forever, and the closing text
+  fades in near the end of that fade-out — see `PLAN.md`. `pnpm check`
+  green. Verified live in Chrome at 1920×1080: title reads at t=0, Moon
+  entrance timing looks right against the title's fade, CMB recedes to
+  near-black before the closing text arrives, no hard cut to background.
+- [x] Card damped-scale: measurement cards now scale with their waypoint
+  (`dampedScale()` in `zoom.ts`, wired via `--callout-scale` in
+  `positionCard()`) instead of sitting fixed-size while the object balloons
+  in and shrinks to a dot. `pnpm check` green. Verified live in Chrome at
+  1920×1080 across several waypoints — card grows subtly on oversized
+  entrance, stays near-1× during the hold, recedes on exit alongside the
+  object, without ever becoming illegible.
+- [x] Replaced hand-picked per-waypoint `LAYER_FRAMES`/`from` arrays with a
+  schedule generator (`schedule.ts`: `buildSchedule`/`normalizeSchedule`),
+  proved on Moon→Sun first, then rolled out to all 10 point-source
+  waypoints plus fog/CMB. Retiming and transition-overlap tuning are now
+  parameter changes (`DURATIONS`/`GAPS` in `site-schedule.ts`), not a
+  fifth hand re-derivation. `schedule.test.ts` asserts the
+  outgoing-opacity-≤0.1-before-incoming-opacity-≥0.9 rule across every
+  generated transition. `pnpm check` green; `spec/depth-as-time.test.ts`
+  updated to compute expected thresholds from the generator instead of
+  hand-copied numbers.
+- [x] Fixed the waypoint-5 (Sagittarius A*) content/image mismatch: the
+  rendered image was a tilted external spiral-galaxy photo, physically
+  impossible as a view of our own galaxy's core from inside it, and
+  near-duplicated the very next waypoint's Andromeda photo. Swapped in a
+  black-hole illustration (accretion disk + polar jets + lensing ring) and
+  fixed the alt text (was describing "seen from its core," the only
+  waypoint diverging from the name-as-alt-text convention). `pnpm check`
+  green. Verified live in Chrome — the black hole now reads as visually
+  distinct from Andromeda's spiral, and `whatIsIt` copy already correctly
+  headlined the black hole so needed no change.
 - [x] Ruler polish: un-hid segment labels, found `overflow: hidden` on
   `.ruler-segments` was clipping anything extending outside its narrow box
   (fixed by moving corner-rounding onto the end segments instead of the
