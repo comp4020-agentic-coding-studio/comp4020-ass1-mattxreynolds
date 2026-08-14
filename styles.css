@@ -206,12 +206,12 @@ nav a {
   margin: 0.5rem 0 0;
 }
 
-/* Structural wrappers shared by every waypoint's HUD (see index.html), but
-   only `.hud-sheet` (mobile bottom-sheet proof-of-concept, Moon only for
-   now — see wireHudSheet in main.ts) gives them any layout of their own;
-   everywhere else they're plain blocks with no visual effect, identical to
-   the un-wrapped markup this replaced. */
-.hud-sheet-toggle {
+/* Shared by every waypoint's HUD (see index.html), but only `.hud-sheet`
+   (mobile full-width bottom-sheet design, Moon only for now — see
+   HUD_SHEET_IDS in main.ts) gives it any layout; everywhere else it's
+   hidden, matching the desktop-card treatment (`.callout-anchor-static-label`
+   below) this borrows its "In human terms" framing from. */
+.hud-anchor-label {
   display: none;
 }
 
@@ -373,13 +373,14 @@ nav a {
     right: 0.75rem;
   }
 
-  /* Bottom-sheet proof-of-concept (Moon only, see HUD_SHEET_IDS in
-     main.ts): collapsed shows just name + distance as a full-width strip
-     pinned to the bottom edge; tap/click/Enter-Space on the summary row, or
-     a vertical swipe anywhere on the sheet, expands it to reveal the
-     lookback + anchor text beneath. Every other waypoint's HUD is
-     unaffected — this whole block only ever applies while `.hud-sheet` is
-     present. */
+  /* Full-width bottom-sheet HUD design (Moon only for now, see
+     HUD_SHEET_IDS in main.ts) — Matt preferred this permanently-expanded
+     card over the compact fixed HUD every other waypoint still uses, so
+     unlike the toggling proof-of-concept it replaced, there's no
+     collapsed state: name + distance sit in a summary row, with the
+     lookback + "in human terms" anchor always shown beneath. This whole
+     block only ever applies while `.hud-sheet` is present, so every other
+     waypoint's HUD is unaffected. */
   .hud.hud-sheet {
     left: 0;
     right: 0;
@@ -391,9 +392,8 @@ nav a {
 
   .hud.hud-sheet .hud-summary {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 0.75rem;
-    cursor: pointer;
   }
 
   .hud.hud-sheet .hud-name {
@@ -404,35 +404,22 @@ nav a {
     margin: 0 auto 0 0;
   }
 
-  .hud.hud-sheet .hud-sheet-toggle {
-    display: block;
-    flex: none;
-    width: 0.55rem;
-    height: 0.55rem;
-    border-right: 2px solid currentcolor;
-    border-bottom: 2px solid currentcolor;
-    opacity: 0.7;
-    transform: rotate(45deg);
-    transition: transform 0.2s ease;
-  }
-
-  .hud.hud-sheet.expanded .hud-sheet-toggle {
-    transform: rotate(-135deg);
-  }
-
   .hud.hud-sheet .hud-detail {
-    display: grid;
-    grid-template-rows: 0fr;
     margin-top: 0.5rem;
-    transition: grid-template-rows 0.25s ease;
   }
 
-  .hud.hud-sheet .hud-detail-inner {
-    overflow: hidden;
+  .hud.hud-sheet .hud-anchor-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.55;
+    margin: 0.5rem 0 0.35rem;
   }
 
-  .hud.hud-sheet.expanded .hud-detail {
-    grid-template-rows: 1fr;
+  .hud.hud-sheet .hud-anchor {
+    margin: 0;
   }
 }
 

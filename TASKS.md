@@ -34,21 +34,27 @@ see `CLAUDE.md`.
   spot-check confirms `getComputedStyle(...).transform` is still exactly
   `matrix(1.8, 0, 0, 1.8, 0, 0)` at the title's rest state — byte-identical
   to before.
-- [x] Mobile adaptation, step 4: bottom-sheet info pattern proof-of-concept
-  on Moon only, replacing the plain fixed HUD for that one waypoint —
-  collapsed state is a full-width strip (name + distance + chevron) pinned
-  to the bottom edge; tap/click, Enter/Space, or a vertical swipe on the
-  summary row expands it to reveal the lookback + anchor text beneath via a
-  CSS-grid height animation, and tapping outside (or the row again)
-  collapses it. Scoped with a `HUD_SHEET_IDS` set (`main.ts`) and a
-  `.hud-sheet` class that only gets any layout/behaviour inside the
-  existing mobile `@media` block, so every other waypoint's HUD and all of
-  desktop are untouched by construction, not by a separate check. `pnpm
+- [x] Mobile adaptation, step 4: full-width bottom-sheet HUD design on Moon
+  only, replacing the plain fixed HUD for that one waypoint. First built as
+  a collapse/expand proof-of-concept, but Matt reviewed it live and said
+  there's enough room to keep it permanently expanded — dropped the
+  toggle/swipe/chevron interaction entirely (`wireHudSheet` removed from
+  `main.ts`) in favour of always showing name + distance + lookback + anchor
+  in one card. Also added the "In human terms" label above the anchor text
+  (`.hud-anchor-label`), matching desktop's `.callout-anchor-static-label`
+  framing, and fixed the name/distance row using `align-items: baseline`
+  instead of `center` so differently-sized text shares one baseline instead
+  of being vertically centred against each other. Scoped with a
+  `HUD_SHEET_IDS` set (`main.ts`) and a `.hud-sheet` class that only gets
+  any layout inside the existing mobile `@media` block, so every other
+  waypoint's HUD and all of desktop are untouched by construction. `pnpm
   check` green (typecheck, build, lint, 34 tests). Verified live in Chrome
-  at 390×844: Moon collapses/expands correctly on click and on
-  tap-outside-to-collapse; Sun (unchanged waypoint) still shows the plain
-  always-visible card with no chevron. Spot-checked 1920×1080: HUD stays
-  correctly suppressed on Moon (diegetic card instead), no visual change.
+  at 390×844: Moon's card is permanently expanded with the label present
+  and the name/distance baselines confirmed aligned via
+  `getBoundingClientRect`; Sun (unchanged waypoint) still shows the
+  compact always-visible card with no label. Spot-checked 1920×1080: HUD
+  stays correctly suppressed on Moon (diegetic card instead), no visual
+  change.
 - [ ] Mobile adaptation, step 5: roll bottom-sheet pattern out to the
   remaining 11 waypoints.
 - [ ] Mobile adaptation, step 6: full mobile regression pass (resize

@@ -76,55 +76,6 @@ function wireIdentityHover(img: HTMLElement, card: HTMLElement) {
   });
 }
 
-// Mobile bottom-sheet proof-of-concept, scoped to a single waypoint (Moon)
-// to prove the mechanic before rolling it out — see TASKS.md. Every other
-// waypoint's HUD keeps its existing always-visible layout untouched: the
-// collapse/expand behaviour and its CSS (see `.hud-sheet` in styles.css,
-// mobile-only) only take effect while the `hud-sheet` class is present,
-// which the render loop only adds for Moon. Tap/click, Enter/Space, and a
-// coarse vertical swipe all toggle the same expanded state.
-function wireHudSheet(hud: HTMLElement) {
-  const summary = hud.querySelector<HTMLElement>('[data-testid="hud-summary"]');
-  if (!summary) return null;
-
-  const setExpanded = (expanded: boolean) => {
-    hud.classList.toggle("expanded", expanded);
-    summary.setAttribute("aria-expanded", String(expanded));
-  };
-
-  summary.setAttribute("role", "button");
-  summary.tabIndex = 0;
-  summary.addEventListener("click", () => setExpanded(!hud.classList.contains("expanded")));
-  summary.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    setExpanded(!hud.classList.contains("expanded"));
-  });
-
-  const SWIPE_THRESHOLD = 30;
-  let touchStartY: number | null = null;
-  hud.addEventListener("touchstart", (event) => {
-    touchStartY = event.touches[0]?.clientY ?? null;
-  });
-  hud.addEventListener("touchend", (event) => {
-    if (touchStartY === null) return;
-    const deltaY = (event.changedTouches[0]?.clientY ?? touchStartY) - touchStartY;
-    if (deltaY < -SWIPE_THRESHOLD) setExpanded(true);
-    else if (deltaY > SWIPE_THRESHOLD) setExpanded(false);
-    touchStartY = null;
-  });
-
-  // Tapping anywhere outside the sheet closes it, the same as tapping the
-  // summary row again — only live while this waypoint is actually in sheet
-  // mode, so it's a no-op for every other waypoint's plain HUD.
-  document.addEventListener("click", (event) => {
-    if (!hud.classList.contains("hud-sheet") || !hud.classList.contains("expanded")) return;
-    if (event.target instanceof Node && !hud.contains(event.target)) setExpanded(false);
-  });
-
-  return { setExpanded };
-}
-
 // All 12 waypoints (Moon through the CMB) — build order complete, see
 // TASKS.md/PLAN.md. Two entrance grammars alternate deliberately: sibling
 // body (offset + oversized, converging in) for same-kind neighbours, field
@@ -200,11 +151,12 @@ const hudAnchor = document.querySelector<HTMLElement>('[data-testid="hud-anchor"
 const rulerSegmentsEl = document.querySelector<HTMLElement>('[data-testid="ruler-segments"]');
 const rulerInput = document.querySelector<HTMLInputElement>('[data-testid="ruler-input"]');
 const calloutsEl = document.querySelector<HTMLElement>('[data-testid="callouts"]');
-const hudSheetCtl = hudEl ? wireHudSheet(hudEl) : null;
 
-// Only Moon uses the bottom-sheet mechanic for now (see wireHudSheet) —
-// this stays a plain single-id check, not a Set, until it's proven and
-// rolled out to the rest in a later task.
+// Only Moon uses the full-width bottom-sheet HUD design for now (proof of
+// concept — see `.hud-sheet` in styles.css, mobile-only) — this stays a
+// plain single-id check, not a Set, until it's proven and rolled out to the
+// rest in a later task. Every other waypoint keeps the existing compact
+// fixed HUD untouched.
 const HUD_SHEET_IDS = new Set(["moon"]);
 
 // `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint
@@ -470,10 +422,7 @@ if (track && layersEl) {
 
     if (current.id !== lastId) {
       lastId = current.id;
-      if (hudEl) {
-        hudEl.classList.toggle("hud-sheet", HUD_SHEET_IDS.has(current.id));
-        hudSheetCtl?.setExpanded(false);
-      }
+      if (hudEl) hudEl.classList.toggle("hud-sheet", HUD_SHEET_IDS.has(current.id));
       if (status) status.textContent = `Now viewing: ${current.name}, light from ${current.lookbackLabel}.`;
     }
   };
