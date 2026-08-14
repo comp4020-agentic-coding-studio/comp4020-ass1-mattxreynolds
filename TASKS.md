@@ -17,6 +17,18 @@ see `CLAUDE.md`.
   `reflections/assignment-1.md` (150–300 words).
 - [ ] `/ship`, then verify the live URL at both viewports.
 
+- [x] Anchor fact redesign: prototyped click-to-reveal "toggle" (Moon) vs.
+  always-visible "static" (Sun) side by side, per Matt's request after
+  flagging the old pill-button reveal as flat/inconsistent. Matt judged
+  live and picked static — rolled out to all 10 point-source waypoints,
+  removing the click gate and `wireReveal` wiring from every desktop
+  callout (mobile HUD reveal unaffected). Reworded the label ("What does
+  that mean?" → "In human terms") and trimmed JADES-GS-z14-0's anchor to
+  drop a clause duplicating `whatIsIt`, both to fit an always-on statement
+  rather than a click-prompt/answer — see `PLAN.md`. `pnpm check` green
+  (typecheck, build, lint, 26 tests). Verified live in Chrome at 1920×1080:
+  Moon/Sun/JADES-GS-z14-0 all render the static label+text correctly, no
+  overflow or overlap even on JADES's longer 5-line anchor text.
 - [x] Rolled out identity/measurement cards to the remaining 8 point-source
   waypoints (Proxima Centauri → JADES-GS-z14-0). Derived a general offset
   rule instead of reusing Moon/Sun's numbers (card x-side opposite the

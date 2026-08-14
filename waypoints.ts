@@ -121,7 +121,7 @@ export const WAYPOINTS: Waypoint[] = [
     distanceLabel: "13.5 billion light-years away",
     lookbackLabel: "13.5 billion years ago",
     lookbackYears: 13.5e9,
-    anchor: "About 300 million years after the Big Bang — one of the first galaxies to ever form.",
+    anchor: "About 300 million years after the Big Bang — before there was an Earth, a Sun, or anything else familiar.",
     whatIsIt: "Currently the most distant galaxy ever confirmed — one of the very first to form.",
     from: 0.752,
   },

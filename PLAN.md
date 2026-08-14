@@ -76,10 +76,10 @@ lookback, one gated relatable-analogy) — thin, and missing the single most
 obviously-expected fact: what the object actually *is*. Fixed by splitting
 each waypoint's diegetic callout into two cards instead of one:
 
-- **Measurement card**: name, distance, lookback label, gated "What does
-  that mean?" relatable analogy. Always visible, positioned with a fixed
-  per-waypoint offset (`CARD_OFFSETS`) pushed clear of the object's image so
-  it doesn't overlap it.
+- **Measurement card**: name, distance, lookback label, always-visible "In
+  human terms" relatable analogy. Positioned with a fixed per-waypoint
+  offset (`CARD_OFFSETS`) pushed clear of the object's image so it doesn't
+  overlap it.
 - **Identity card**: one factual "what is this" line (`Waypoint.whatIsIt`).
   Originally always-visible like the measurement card; changed to a
   hover-triggered tooltip (Matt: "only appear when the user hovers over the
@@ -137,6 +137,23 @@ floating card, most likely — is an explicit later decision.
 Data for all 10 point-source waypoints lives in `waypoints.ts` (`whatIsIt`
 field) and all 10 are wired into the card system (`CARD_OFFSETS` in
 `main.ts`).
+
+**Anchor fact: static, not click-gated (decided, rolled out to all 10).**
+The original click-to-reveal pill button was prototyped two ways side by
+side on Moon and Sun — a "toggle" (pill replaced by a label + chevron,
+divider on reveal) and a "static" (no gate, always visible, styled like the
+identity card's label/text pair). Matt reviewed both live and picked static:
+the anchor fact is a single short sentence and the emotional payoff of the
+whole card, so gating it behind a click risked people never seeing it,
+which the click affordance's polish didn't fix. Rolled out to all 10
+point-source waypoints; the reveal-button/`wireReveal` machinery in
+`main.ts` now only wires the mobile HUD's own anchor reveal (deferred
+separately, see below), not the desktop callouts. Label reworded from
+"What does that mean?" (a question, apt for a click prompt) to "In human
+terms" (a declarative lead-in, apt for an always-on statement); anchor copy
+for JADES-GS-z14-0 trimmed to drop a clause duplicating `whatIsIt` ("one of
+the first galaxies to ever form") now that both sit on the same
+always-visible card.
 
 ## Follow-up polish (planned, not yet built)
 

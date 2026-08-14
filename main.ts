@@ -305,7 +305,6 @@ if (track && layersEl) {
   // track the object's live entrance/exit motion. The identity card has no
   // leader line and isn't scroll-positioned at all — see wireIdentityHover.
   const calloutEls = new Map<string, HTMLElement>();
-  const calloutReveals = new Map<string, ReturnType<typeof wireReveal>>();
   const identityCardEls = new Map<string, HTMLElement>();
   if (calloutsEl) {
     for (const waypoint of staged) {
@@ -322,15 +321,10 @@ if (track && layersEl) {
         <p class="callout-name">${waypoint.name}</p>
         <p class="callout-distance">${waypoint.distanceLabel}</p>
         <p class="callout-lookback">You are seeing light that left ${waypoint.lookbackLabel}</p>
-        <button type="button" class="callout-anchor-reveal" aria-expanded="false">What does that mean?</button>
-        <p class="callout-anchor">${waypoint.anchor}</p>
+        <p class="callout-anchor-static-label">In human terms</p>
+        <p class="callout-anchor-static-text">${waypoint.anchor}</p>
       `;
       positionLeaderLine(callout, offset);
-      const revealBtn = callout.querySelector<HTMLButtonElement>(".callout-anchor-reveal");
-      const anchorP = callout.querySelector<HTMLElement>(".callout-anchor");
-      if (revealBtn && anchorP) {
-        calloutReveals.set(waypoint.id, wireReveal(revealBtn, anchorP));
-      }
       calloutsEl.appendChild(callout);
       calloutEls.set(waypoint.id, callout);
 
@@ -453,7 +447,6 @@ if (track && layersEl) {
     if (current.id !== lastId) {
       lastId = current.id;
       hudAnchorRevealCtl?.collapse();
-      for (const ctl of calloutReveals.values()) ctl.collapse();
       if (status) status.textContent = `Now viewing: ${current.name}, light from ${current.lookbackLabel}.`;
     }
   };

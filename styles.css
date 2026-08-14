@@ -177,8 +177,7 @@ nav a {
   display: none;
 }
 
-.hud-anchor-reveal,
-.callout-anchor-reveal {
+.hud-anchor-reveal {
   font: inherit;
   font-size: 0.85rem;
   color: inherit;
@@ -189,8 +188,7 @@ nav a {
   cursor: pointer;
 }
 
-.hud-anchor-reveal:hover,
-.callout-anchor-reveal:hover {
+.hud-anchor-reveal:hover {
   background: rgb(255 255 255 / 20%);
 }
 
@@ -347,12 +345,6 @@ nav a {
   margin: 0;
 }
 
-.callout-anchor {
-  font-style: italic;
-  opacity: 0.85;
-  margin: 0.5rem 0 0;
-}
-
 /* Identity card: a hover tooltip, not a scroll-tracked callout — see
    wireIdentityHover in main.ts. Fixed to the viewport and positioned at the
    cursor in JS (left/top set directly, not --callout-x/-y), so it overrides
@@ -383,8 +375,26 @@ nav a {
   margin: 0;
 }
 
-.callout-anchor:not(.revealed) {
-  display: none;
+/* Anchor fact: always visible, no click gate (Matt reviewed both a
+   click-to-reveal toggle and this static version side by side on Moon/Sun
+   and picked static — the anchor fact is the emotional payoff of the whole
+   card, and gating it risked people never seeing it at all). Styled like the
+   identity card's label/text pair so the two always-on facts share one
+   visual language despite their different triggers (hover vs. none). */
+.callout-anchor-static-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+  margin: 0.5rem 0 0.35rem;
+}
+
+.callout-anchor-static-text {
+  font-size: 0.95rem;
+  font-style: italic;
+  opacity: 0.85;
+  margin: 0;
 }
 
 /* Static local geometry set once at init from CARD_OFFSETS — the dog-leg
