@@ -346,10 +346,20 @@ if (track && layersEl) {
 
   const stateMap = new Map<string, LayerState>();
   let lastId: string | null = null;
+  // Cached so the resize handler below can restore it after the viewport
+  // changes — the track is sized in vh (see trackHeightVh above), so a
+  // resize (rotating a phone, resizing the window, or a mobile browser's
+  // chrome hiding/showing) changes both the track's pixel height and
+  // window.innerHeight while window.scrollY (an absolute pixel count) stays
+  // put. Left alone, that shifts (scrollY - trackTop) / scrollable on every
+  // resize, snapping the animation to a different waypoint the user never
+  // scrolled to.
+  let lastProgress = 0;
 
   const render = () => {
     const { rect, trackTop, scrollable } = trackMetrics();
     const progress = clampProgress(scrollable > 0 ? (window.scrollY - trackTop) / scrollable : 0);
+    lastProgress = progress;
 
     document.documentElement.classList.toggle(
       "track-visible",
@@ -555,7 +565,14 @@ if (track && layersEl) {
 
   render();
   window.addEventListener("scroll", render, { passive: true });
-  window.addEventListener("resize", render);
+  window.addEventListener("resize", () => {
+    // Restore the pre-resize progress against the new metrics, rather than
+    // just re-rendering at whatever scrollY the resize happened to leave us
+    // at — see lastProgress's comment above.
+    const { trackTop, scrollable } = trackMetrics();
+    window.scrollTo({ top: trackTop + lastProgress * scrollable });
+    render();
+  });
 
   if (rulerInput) {
     rulerInput.addEventListener("input", () => {
