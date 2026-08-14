@@ -19,12 +19,21 @@ see `CLAUDE.md`.
   gated) now show the anchor line immediately with no button in the DOM;
   spot-checked 1920×1080 unaffected (HUD still correctly suppressed in
   favour of the diegetic card there).
-- [ ] Mobile adaptation, step 3: fix title/closing resting-scale overflow
-  on mobile (`TITLE_SCALE`/`CLOSING_SCALE` = 1.8 in `site-schedule.ts`
-  overflows a 390px viewport — 390 × 1.8 = 702px measured bounding-box
-  width — since it's a CSS transform on top of a correctly-sized layout
-  box, not a layout bug). Make responsive without changing desktop's
-  rendered value.
+- [x] Mobile adaptation, step 3: fixed title/closing resting-scale overflow
+  on mobile. `TITLE_SCALE`/`CLOSING_SCALE` = 1.8 in `site-schedule.ts`
+  overflowed a 390px viewport (390 × 1.8 = 702px measured bounding-box
+  width) since it's a CSS transform on top of a correctly max-width-capped
+  layout box, not a layout bug — the box only has headroom to scale up on
+  viewports wider than its 32rem cap. Added `maxSafeTextLayerScale()` in
+  `main.ts`, clamping the applied title/closing scale to whatever the live
+  viewport width can afford each frame, computed from `window.innerWidth`
+  rather than a hardcoded breakpoint — self-corrects on resize too.
+  `pnpm check` green (typecheck, build, lint, 34 tests). Verified live in
+  Chrome: 390×844 title and closing layers both measure exactly 390px wide
+  (viewport width, no overflow) at their most-scaled points; 1920×1080
+  spot-check confirms `getComputedStyle(...).transform` is still exactly
+  `matrix(1.8, 0, 0, 1.8, 0, 0)` at the title's rest state — byte-identical
+  to before.
 - [ ] Mobile adaptation, step 4: bottom-sheet info pattern proof-of-concept
   on Moon only (collapsed slim strip + tap/swipe-to-expand full card),
   replacing the plain fixed HUD.

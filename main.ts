@@ -290,6 +290,20 @@ if (track && layersEl) {
     return { rect, trackTop, scrollable };
   };
 
+  // Title/closing (see LAYER_FRAMES.title/.closing in site-schedule.ts) rest
+  // at TITLE_SCALE/CLOSING_SCALE, a resting scale tuned for desktop's
+  // headroom: their text box is capped at 32rem (see .layer-title/.layer-closing
+  // in styles.css) but only actually narrower than the viewport on wide
+  // screens — on a phone-width viewport the box already fills the full
+  // width, so scaling it up at all overflows. Cap the applied scale to
+  // whatever the current viewport can afford instead of hardcoding a
+  // breakpoint, so this self-corrects on resize too.
+  const TEXT_LAYER_MAX_WIDTH = 512; // matches .layer-title/.layer-closing's 32rem
+  const maxSafeTextLayerScale = () => {
+    const boxWidth = Math.min(window.innerWidth, TEXT_LAYER_MAX_WIDTH);
+    return boxWidth > 0 ? window.innerWidth / boxWidth : 1;
+  };
+
   const stateMap = new Map<string, LayerState>();
   let lastId: string | null = null;
 
@@ -308,13 +322,15 @@ if (track && layersEl) {
 
     if (titleLayer) {
       const titleState = interpLayer(LAYER_FRAMES.title, progress);
-      titleLayer.style.transform = `scale(${titleState.scale})`;
+      const scale = Math.min(titleState.scale, maxSafeTextLayerScale());
+      titleLayer.style.transform = `scale(${scale})`;
       titleLayer.style.opacity = String(titleState.opacity);
     }
 
     if (closingLayer) {
       const closingState = interpLayer(LAYER_FRAMES.closing, progress);
-      closingLayer.style.transform = `scale(${closingState.scale})`;
+      const scale = Math.min(closingState.scale, maxSafeTextLayerScale());
+      closingLayer.style.transform = `scale(${scale})`;
       closingLayer.style.opacity = String(closingState.opacity);
     }
 
