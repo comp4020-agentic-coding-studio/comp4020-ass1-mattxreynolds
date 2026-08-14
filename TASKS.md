@@ -94,30 +94,36 @@ see `CLAUDE.md`.
   (typecheck, build, lint, 34 tests). Verified live in Chrome at 390×844
   across all 6 affected waypoints plus CMB — all settle within the
   viewport with margin, no cropping. See `a3d9583`.
-- [x] Matt: the mobile identity card should shrink and sink into the bottom
-  of the screen as its own image fades out, and the next waypoint's card
-  should reverse that — fade in while growing up out of the bottom — rather
-  than converging onto the object's own position as it fades (the prior
-  "attach to the object" behaviour). Dropped `MOBILE_IDENTITY_OFFSETS`'
-  unused `x` field (always 0, no longer needed once the card stopped
-  tracking the object's own horizontal sweep) down to a plain per-id rest
-  y-offset. In render(), `--identity-y` now blends between that rest offset
-  (opacity 1) and a fixed point below the fold, `window.innerHeight * 0.55`
-  (opacity 0), using the card's own live opacity; `--identity-scale`
-  multiplies `dampedScale(state.scale)` by that same opacity so the shrink/
-  grow reads as coming from nothing at the bottom, not just sliding at a
-  fixed size. `--identity-x` is now always `0px` (no more per-waypoint
-  side). `pnpm check` green (typecheck, build, lint, 34 tests). Verified
-  live in Chrome at 390×844 across the Moon→Sun transition: an opacity/
-  transform scan shows Moon's card shrinking and translating downward as
-  its opacity drops (e.g. scale 0.36→0.20→0.16, ty 102→217→302 as opacity
-  falls 0.49→0.31→0.14), then Sun's own card growing back up from the same
-  region as its opacity rises; screenshots confirm the card is essentially
-  invisible at Sun's low-opacity entrance and reads as "emerging from the
-  bottom" by mid-fade. Confirmed hidden throughout the title screen and
-  closing (p=0, 0.95, 1.0). Spot-checked 1920×1080 across four progress
-  points — `.identity-mobile` computed `display: none` throughout,
-  unaffected.
+- [x] Added a sink-into/grow-from-bottom fade to the mobile HUD (name +
+  distance + lookback + anchor), matching the image crossfade it sits
+  under instead of the old flat display-toggle. First built by mistake on
+  the small "what is this?" identity card — Matt caught it ("that is the
+  wrong info card... i wanted you to make the one with name and distance
+  do it"), so that attempt was reverted and rebuilt on `.hud` instead.
+  Mirrors the identity card's own "highest live opacity wins" fix (below):
+  every frame, whichever waypoint is currently most opaque drives both the
+  HUD's text and a new `--hud-lift` custom property (`main.ts`), which the
+  mobile `.hud` rule (`styles.css`) reads via `transform-origin: bottom
+  center; transform: translateY(calc((1 - var(--hud-lift)) * 100%))
+  scale(var(--hud-lift))` — at lift 1 the sheet sits at rest, at lift 0
+  it's shrunk to nothing and translated fully below the fold. Also removed
+  the CMB waypoint's abrupt hard cutoff for both cards
+  (`hud-ended`/`hudExitStart`, previously fired the instant CMB's own
+  fade-out began rather than when it finished): both the HUD and the
+  identity card now just ride their own live opacity to 0 as the CMB image
+  fades, same as every other waypoint's hand-off, and stay invisible
+  through the closing text since `interpLayer` holds CMB's last frame
+  (opacity 0) for the rest of the scroll. `pnpm check` green (typecheck,
+  build, lint, 34 tests). Verified live in Chrome at 390×844: a scan
+  through the Moon→Sun transition confirms the HUD's opacity/`--hud-lift`/
+  transform track live opacity exactly (e.g. lift 0.49 mid-exit, matrix
+  translateY ~92px); a scan through the fog→CMB→closing transition
+  confirms both cards now fade smoothly to 0 in step with the CMB image
+  (lift/opacity 0.94 → 0.43 → 0 across p=0.92–0.98) instead of vanishing
+  abruptly at the old cutoff, and stay hidden through the closing text.
+  Spot-checked 1920×1080 throughout — HUD stays `display: none`
+  unconditionally (still always `hud-suppressed`), no visual change from
+  before.
 - [x] Fixed the mobile HUD showing "The Moon" at the bottom of the title
   screen. Root cause: `currentWaypoint` (`zoom.ts`) defaults `current` to
   `staged[0]` (Moon) from progress 0 — before Moon's own entrance has even

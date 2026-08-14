@@ -224,19 +224,12 @@ nav a {
   }
 }
 
-/* Reaching the closing beat hides the HUD on every viewport, not just
-   desktop — without this, mobile (which has no diegetic callout to hand off
-   to) keeps showing the last waypoint's card frozen behind the closing
-   text forever. See hud-ended in main.ts. */
-.hud.hud-ended {
-  display: none;
-}
-
-/* Same "every viewport" reasoning as hud-ended above: before the Moon has
-   actually started appearing, there's nothing to show yet — without this,
-   mobile's always-on HUD (no hasCard suppression to ride, unlike desktop)
-   shows the Moon's info at the bottom of the title screen. See hud-not-started
-   in main.ts. */
+/* Before the Moon has actually started appearing, there's nothing to show
+   yet — without this, mobile's always-on HUD (no hasCard suppression to
+   ride, unlike desktop) shows the Moon's info at the bottom of the title
+   screen. See hud-not-started in main.ts. The closing beat needs no matching
+   rule any more: the CMB card's own hudLift fade (see the mobile .hud rule
+   below) already takes it to invisible in step with the CMB image. */
 .hud.hud-not-started {
   display: none;
 }
@@ -471,19 +464,22 @@ nav a {
   /* Small floating card in the blank space between the ruler and the image
      (Matt's explicit call over a full-width top sheet) — same visual
      language as the desktop hover card (compact, translucent, rounded)
-     rather than the bottom sheet's full-width treatment. --identity-y/-scale
-     (set every frame in render()) blend between the card's rest position
-     above the image and a point below the fold as the object's own opacity
-     fades, so it sinks into / grows out of the bottom of the screen with its
-     own image's fade rather than just fading in place; --identity-x is
-     always 0, the card stays horizontally centred. An explicit `width`
-     rather than `max-width` is required for the centring transform below to
-     render correctly: an auto-width box anchored at `left: 50%` gets its
-     shrink-to-fit width silently capped to the remaining half of the
-     container (a real, if obscure, quirk of the CSS auto-width algorithm),
-     which pinned it to the right half of the viewport instead of centring it
-     until this was found and fixed. `:not([hidden])` matters here — see the
-     base rule above. */
+     rather than the bottom sheet's full-width treatment. Tracks the
+     object's own live x/y/scale transform (--identity-x/-y/-scale, set
+     every frame in render() from the same state used for the layer itself)
+     rather than sitting at a fixed screen position, so it "attaches" to the
+     image — sliding in from the same side and growing/shrinking with it,
+     not just fading in place. Unlike the desktop `.callout` cards (which
+     use large asymmetric offsets to clear the image and never need
+     centring), this one needs to stay centred over the image at rest, so
+     it needs its own -50%/-50% self-centring baked into the transform on
+     top of that offset — an explicit `width` rather than `max-width` is
+     required for this to render correctly: an auto-width box anchored at
+     `left: 50%` gets its shrink-to-fit width silently capped to the
+     remaining half of the container (a real, if obscure, quirk of the CSS
+     auto-width algorithm), which pinned it to the right half of the
+     viewport instead of centring it until this was found and fixed.
+     `:not([hidden])` matters here — see the base rule above. */
   .identity-mobile:not([hidden]) {
     display: block;
     position: absolute;
@@ -518,7 +514,16 @@ nav a {
      permanently-expanded card (no collapse/expand) over the old compact
      fixed HUD. Name + distance sit in a summary row; the lookback + "in
      human terms" anchor always show beneath. Desktop is untouched — this
-     whole block only ever applies inside the mobile media query. */
+     whole block only ever applies inside the mobile media query.
+
+     --hud-lift (0-1, set every frame in render() from whichever waypoint is
+     currently most opaque) drives the sheet fading, shrinking and sinking
+     into the bottom edge as its waypoint's image fades out, then growing
+     back up out of the bottom as the next one fades in — same sink/grow
+     language as the image crossfade it sits under, rather than a flat
+     display-toggle. `transform-origin: bottom center` keeps the bottom edge
+     anchored through the scale so it reads as retracting into the screen
+     edge, not shrinking toward its own centre. */
   .hud {
     left: 0;
     right: 0;
@@ -526,6 +531,8 @@ nav a {
     max-width: none;
     border-radius: 1rem 1rem 0 0;
     padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    transform-origin: bottom center;
+    transform: translateY(calc((1 - var(--hud-lift, 1)) * 100%)) scale(var(--hud-lift, 1));
   }
 
   .hud-summary {

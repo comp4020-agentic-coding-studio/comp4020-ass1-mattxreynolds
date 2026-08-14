@@ -156,30 +156,33 @@ const identityMobileText = document.querySelector<HTMLElement>('[data-testid="id
 
 // Mobile-only "what is this?" card: desktop's identity tooltip only appears
 // on hover (see wireIdentityHover), which doesn't exist on touch, so mobile
-// gets its own always-rendered card instead. Rest offset (px, above the
-// object's own screen-space centre) is grouped by the image's own rendered
-// mobile size (see styles.css's `.layer img` rules): the four sibling-body
-// waypoints sized by the base clamp (~224px tall on a 390px-wide phone) get
-// the Moon's proven -180; the six field/point-source waypoints bumped to
-// `min(92vw, cap)` on mobile (~359px tall) get a larger -250 to clear that
-// bigger footprint; the fog/CMB veils have no discrete object to clear but
-// fill the same screen area, so they use the same -250. The card no longer
-// tracks the object's own live x/y sweep (see render()) — it sinks into /
-// grows out of the bottom edge of the screen instead, so only a single rest
-// y-offset is needed, not a per-waypoint side.
-const MOBILE_IDENTITY_OFFSETS: Record<string, number> = {
-  moon: -180,
-  sun: -200,
-  "proxima-centauri": -200,
-  vega: -200,
-  "sagittarius-a": -250,
-  andromeda: -250,
-  "virgo-cluster": -250,
-  "3c273": -250,
-  "gn-z11": -250,
-  "jades-gs-z14-0": -250,
-  "reionization-fog": -250,
-  cmb: -250,
+// gets its own always-rendered card instead. Offset (px, from the object's
+// own live screen-space centre) works exactly like CARD_OFFSETS — consumed
+// via the object's live x/y/scale transform, not a static screen position —
+// so the card "attaches" to the image: it slides in from the same side and
+// grows/shrinks the same way, at Matt's request, rather than fading in place.
+// x stays 0 for every waypoint (the card sits centred above the image, so it
+// sways with the same live sibling-entrance sweep the image itself gets,
+// rather than needing its own per-waypoint side). y is grouped by the
+// image's own rendered mobile size (see styles.css's `.layer img` rules): the
+// four sibling-body waypoints sized by the base clamp (~224px tall on a
+// 390px-wide phone) get the Moon's proven -180; the six field/point-source
+// waypoints bumped to `min(92vw, cap)` on mobile (~359px tall) get a larger
+// -250 to clear that bigger footprint; the fog/CMB veils have no discrete
+// object to clear but fill the same screen area, so they use the same -250.
+const MOBILE_IDENTITY_OFFSETS: Record<string, { x: number; y: number }> = {
+  moon: { x: 0, y: -180 },
+  sun: { x: 0, y: -200 },
+  "proxima-centauri": { x: 0, y: -200 },
+  vega: { x: 0, y: -200 },
+  "sagittarius-a": { x: 0, y: -250 },
+  andromeda: { x: 0, y: -250 },
+  "virgo-cluster": { x: 0, y: -250 },
+  "3c273": { x: 0, y: -250 },
+  "gn-z11": { x: 0, y: -250 },
+  "jades-gs-z14-0": { x: 0, y: -250 },
+  "reionization-fog": { x: 0, y: -250 },
+  cmb: { x: 0, y: -250 },
 };
 
 // `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint
@@ -410,16 +413,48 @@ if (track && layersEl) {
 
     const hasCard = HAS_CARD_IDS.has(current.id);
 
-    if (hudName) hudName.textContent = current.name;
-    if (hudDistance) hudDistance.textContent = current.distanceLabel;
-    if (hudLookback) hudLookback.textContent = `You are seeing light that left ${current.lookbackLabel}`;
-    if (hudAnchor) hudAnchor.textContent = current.anchor;
+    // Same "highest live opacity wins" tracking as identityMobileEl below —
+    // `current` switches over well after a new waypoint's fade-in has
+    // finished (see currentWaypoint's `from`, the midpoint of fadeInEnd and
+    // convergeEnd in schedule.ts), so gating the HUD's own fade/sink on
+    // `current` would only ever show the very first waypoint's entrance;
+    // every other one would pop straight to full size. Tracking live opacity
+    // instead lets the mobile bottom sheet sink into the bottom edge as its
+    // waypoint fades out and grow back up out of it as the next one fades
+    // in, matching the image crossfade it sits under.
+    let hudBestId: string | null = null;
+    let hudBestState: LayerState | null = null;
+    let hudBestOpacity = 0;
+    for (const waypoint of staged) {
+      const candidate = stateMap.get(waypoint.id);
+      if (candidate && candidate.opacity > hudBestOpacity) {
+        hudBestOpacity = candidate.opacity;
+        hudBestId = waypoint.id;
+        hudBestState = candidate;
+      }
+    }
+    const hudWaypoint = (hudBestId ? staged.find((w) => w.id === hudBestId) : undefined) ?? current;
+
+    if (hudName) hudName.textContent = hudWaypoint.name;
+    if (hudDistance) hudDistance.textContent = hudWaypoint.distanceLabel;
+    if (hudLookback) hudLookback.textContent = `You are seeing light that left ${hudWaypoint.lookbackLabel}`;
+    if (hudAnchor) hudAnchor.textContent = hudWaypoint.anchor;
     if (hudEl) {
+      const hudLift = hudBestState?.opacity ?? 0;
+      hudEl.style.opacity = String(hudLift);
+      // Only consumed inside the mobile media query's `.hud` transform (see
+      // styles.css) — desktop's `.hud` never reads --hud-lift, and is always
+      // hud-suppressed besides (every waypoint has a diegetic callout there),
+      // so this has no effect above the 768px breakpoint.
+      hudEl.style.setProperty("--hud-lift", String(hudLift));
       hudEl.classList.toggle("hud-suppressed", hasCard);
-      // Unlike hud-suppressed (a desktop-only concern: a diegetic callout has
-      // taken over), this is "we've reached the closing beat" — true on every
-      // viewport, so it can't ride the same desktop-gated CSS rule.
-      hudEl.classList.toggle("hud-ended", progress >= SITE_SCHEDULE.hudExitStart);
+      // No progress-based "closing beat" cutoff here any more — the CMB card
+      // (the last waypoint) now leaves the same way every other waypoint's
+      // card does, riding hudLift down to 0 as the CMB image itself fades
+      // out, instead of the abrupt display:none this used to force the
+      // instant that fade-out began. interpLayer clamps to the CMB's own
+      // last frame (opacity 0) for the rest of the scroll, so hudLift simply
+      // stays 0 through the closing text — no separate hide needed.
       // `current` defaults to the Moon (staged[0]) from progress 0 — before
       // the title has even started fading out and long before the Moon's own
       // entrance begins — so without this, mobile's always-on HUD (it has no
@@ -461,33 +496,26 @@ if (track && layersEl) {
       }
       const waypoint = bestId ? staged.find((w) => w.id === bestId) : undefined;
       const state = bestState;
-      const restOffset = bestId ? MOBILE_IDENTITY_OFFSETS[bestId] : undefined;
-      const visible =
-        restOffset !== undefined &&
-        Boolean(waypoint?.whatIsIt) &&
-        bestOpacity > 0.01 &&
-        progress < SITE_SCHEDULE.hudExitStart;
+      const offset = bestId ? MOBILE_IDENTITY_OFFSETS[bestId] : undefined;
+      // No separate closing-beat cutoff, same reasoning as the HUD above —
+      // the CMB card fades out on its own live opacity (bestOpacity below)
+      // as the CMB image itself fades, rather than being force-hidden the
+      // instant that fade-out starts.
+      const visible = Boolean(offset) && Boolean(waypoint?.whatIsIt) && bestOpacity > 0.01;
       identityMobileEl.hidden = !visible;
-      if (visible && state && restOffset !== undefined) {
+      if (visible && state && offset) {
         identityMobileText.textContent = waypoint?.whatIsIt ?? "";
         identityMobileEl.style.opacity = String(state.opacity);
-        // Sinks into / grows out of the bottom edge of the screen with its
-        // own object's fade, rather than converging onto the object's own
-        // position — Matt's explicit request: the outgoing card should
-        // shrink and disappear downward as its image fades out, and the next
-        // one should reverse that, growing up out of the bottom as it fades
-        // in. Blend between the rest position (fully clear above the image,
-        // at opacity 1) and a point below the fold (at opacity 0) using the
-        // object's own live opacity.
-        const restPy = (state.y / 100) * window.innerHeight + restOffset;
-        const exitPy = window.innerHeight * 0.55;
-        const py = exitPy + (restPy - exitPy) * state.opacity;
-        identityMobileEl.style.setProperty("--identity-x", "0px");
+        // Scale the offset itself by the object's own opacity: at full opacity
+        // the card sits fully clear of the image, but as opacity fades toward
+        // 0 (entering or exiting) the offset fades toward 0 too, so the card
+        // converges onto the object's own position instead of just shrinking
+        // in place at a fixed spot while everything around it moves.
+        const px = (state.x / 100) * window.innerWidth + offset.x * state.opacity;
+        const py = (state.y / 100) * window.innerHeight + offset.y * state.opacity;
+        identityMobileEl.style.setProperty("--identity-x", `${px}px`);
         identityMobileEl.style.setProperty("--identity-y", `${py}px`);
-        // Shrink/grow in step with the same opacity blend so it reads as
-        // sinking away to nothing / growing up from nothing, not just
-        // sliding at a fixed size.
-        identityMobileEl.style.setProperty("--identity-scale", String(dampedScale(state.scale) * state.opacity));
+        identityMobileEl.style.setProperty("--identity-scale", String(dampedScale(state.scale)));
       }
     }
 

@@ -201,10 +201,6 @@ function buildSiteSchedule() {
     trackHeightVh: totalVh,
     starfieldFadeStart: jadesHoldEnd / totalVh,
     starfieldFadeEnd: fogFadeInEnd / totalVh,
-    // The HUD's CMB card leaves in step with the CMB image itself rather
-    // than lingering into the text-only ending — hidden from the moment the
-    // CMB starts fading out, same as the wall it's describing.
-    hudExitStart: cmbSettledEnd / totalVh,
   };
 }
 
