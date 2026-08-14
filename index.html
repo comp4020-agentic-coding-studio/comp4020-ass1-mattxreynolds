@@ -13,17 +13,23 @@
       </nav>
     </header>
     <main>
-      <section class="hook">
-        <h1>Depth as Time</h1>
-        <p>
-          Everything you can see is already the past. Scroll outward, and
-          find out how far back it goes — and where it stops.
-        </p>
-      </section>
       <div class="track" data-testid="track">
         <div class="stage">
           <div class="starfield" data-testid="starfield"></div>
           <div class="layers" data-testid="layers"></div>
+          <div class="layer layer-title" data-testid="title-layer">
+            <h1>Depth as Time</h1>
+            <p>
+              Light takes time to travel. Look far enough, and you're not
+              just seeing something distant — you're seeing something
+              <em>old</em>.
+            </p>
+            <p>
+              Scroll to move outward. Each stop is further away than the
+              last, and further back in time to match — until the trail
+              runs out completely.
+            </p>
+          </div>
           <div class="ruler" data-testid="ruler">
             <div class="ruler-segments" data-testid="ruler-segments"></div>
             <div class="ruler-endcap" data-testid="ruler-endcap" aria-hidden="true"></div>
@@ -53,16 +59,16 @@
             </button>
             <p class="hud-anchor" id="hud-anchor" data-testid="hud-anchor"></p>
           </div>
+          <div class="layer layer-closing" data-testid="closing-layer">
+            <p>
+              That's the wall. Not a better telescope away — a fact about
+              light itself: before this moment, none had escaped yet to
+              travel anywhere. Everything above was further away, and
+              further back. This is as far back as there is.
+            </p>
+          </div>
         </div>
       </div>
-      <section class="payoff">
-        <p>
-          That's the wall. Not a better telescope away — a fact about light
-          itself: before this moment, none had escaped yet to travel
-          anywhere. Everything above was further away, and further back.
-          This is as far back as there is.
-        </p>
-      </section>
       <p class="visually-hidden" aria-live="polite" data-testid="status"></p>
     </main>
     <script type="module" src="./main.ts"></script>

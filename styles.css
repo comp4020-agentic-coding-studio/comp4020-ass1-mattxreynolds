@@ -41,28 +41,41 @@ nav a {
   white-space: nowrap;
 }
 
-.hook {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
+/* The title and closing layers replace the former standalone `.hook` and
+   `.payoff` sections — both are text-only layers inside the track (see
+   main.ts), on the same schedule as everything else, so they're
+   positioned/sized via `.layer`'s own absolute/flex base and only add their
+   own typography and text box here. */
+.layer-title,
+.layer-closing {
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   text-align: center;
   padding: 2rem;
   max-width: 32rem;
   margin: 0 auto;
 }
 
-.hook h1 {
+.layer-title h1 {
   font-size: clamp(2rem, 6vw, 3.5rem);
   margin: 0 0 1rem;
 }
 
-.hook p {
+.layer-title p {
   font-size: 1.1rem;
   opacity: 0.85;
   margin: 0;
+}
+
+/* Unlike the title (which sits over the near-black starfield), the closing
+   text overlays the CMB's own busy, colourful pattern — the same
+   legibility problem the HUD/callout cards solve, so it gets the same
+   translucent backdrop rather than sitting directly on the image. */
+.layer-closing p {
+  font-size: 1.25rem;
+  margin: 0;
+  background: rgb(5 5 10 / 65%);
+  border-radius: 0.75rem;
+  padding: 1.5rem 2rem;
 }
 
 .track {
@@ -428,9 +441,9 @@ nav a {
 }
 
 /* Scoped to `.track` being in view (toggled in main.ts render()) so
-   `.hook`/`.payoff`, where the ruler has no meaning, keep a normal
-   scrollbar — native wheel/touch/keyboard scroll stays the only real
-   navigation mechanism throughout; this only hides its visual chrome. */
+   `.payoff`, where the ruler has no meaning, keeps a normal scrollbar —
+   native wheel/touch/keyboard scroll stays the only real navigation
+   mechanism throughout; this only hides its visual chrome. */
 html.track-visible {
   scrollbar-width: none;
 }
@@ -439,16 +452,3 @@ html.track-visible::-webkit-scrollbar {
   display: none;
 }
 
-.payoff {
-  min-height: 60vh;
-  min-height: 60dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 2rem;
-  max-width: 32rem;
-  margin: 0 auto;
-  font-size: 1.25rem;
-  opacity: 0.9;
-}

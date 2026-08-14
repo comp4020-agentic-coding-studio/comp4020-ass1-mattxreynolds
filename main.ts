@@ -155,6 +155,20 @@ const STARFIELD_FRAMES: LayerFrame[] = [
 const track = document.querySelector<HTMLElement>('[data-testid="track"]');
 const starfieldEl = document.querySelector<HTMLElement>('[data-testid="starfield"]');
 const layersEl = document.querySelector<HTMLElement>('[data-testid="layers"]');
+// Static markup (see index.html), not JS-created — its h1 needs to be real,
+// present-in-the-built-HTML markup for spec/invariants.test.ts's "exactly
+// one top-level heading" check, which parses dist/index.html directly
+// without executing main.ts. main.ts only animates it (see render()),
+// the same way it only positions the existing `.hud` markup rather than
+// creating that from scratch either. A later sibling of `.layers` in the
+// DOM, so it paints on top of every waypoint layer inside — including
+// Moon, which per PLAN.md Task 6 the title sits in front of.
+const titleLayer = document.querySelector<HTMLElement>('[data-testid="title-layer"]');
+// Same static-markup rationale as titleLayer above (nothing here needs to be
+// in the built HTML for a spec check, but it's the former standalone
+// `.payoff` section's copy, kept as real markup rather than JS-injected
+// text). A later sibling still, so it paints on top of the CMB layer.
+const closingLayer = document.querySelector<HTMLElement>('[data-testid="closing-layer"]');
 const hudEl = document.querySelector<HTMLElement>('[data-testid="hud"]');
 const status = document.querySelector<HTMLElement>('[data-testid="status"]');
 const hudName = document.querySelector<HTMLElement>('[data-testid="hud-name"]');
@@ -321,6 +335,18 @@ if (track && layersEl) {
       starfieldEl.style.opacity = String(interpLayer(STARFIELD_FRAMES, progress).opacity);
     }
 
+    if (titleLayer) {
+      const titleState = interpLayer(LAYER_FRAMES.title, progress);
+      titleLayer.style.transform = `scale(${titleState.scale})`;
+      titleLayer.style.opacity = String(titleState.opacity);
+    }
+
+    if (closingLayer) {
+      const closingState = interpLayer(LAYER_FRAMES.closing, progress);
+      closingLayer.style.transform = `scale(${closingState.scale})`;
+      closingLayer.style.opacity = String(closingState.opacity);
+    }
+
     const current = currentWaypoint(progress, staged);
 
     for (const waypoint of staged) {
@@ -360,7 +386,7 @@ if (track && layersEl) {
       hudAnchor.classList.toggle("gated", gated);
     }
     if (hudAnchorReveal) hudAnchorReveal.hidden = !gated;
-    if (hudEl) hudEl.classList.toggle("hud-suppressed", gated);
+    if (hudEl) hudEl.classList.toggle("hud-suppressed", gated || progress >= SITE_SCHEDULE.hudExitStart);
 
     // Each callout crossfades on its own object's own fade, rather than
     // snapping visible/hidden on the coarse current-waypoint cutover — this
