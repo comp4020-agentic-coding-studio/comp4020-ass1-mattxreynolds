@@ -4,8 +4,6 @@ Small rolling working set. Collapse to one line + commit link once done —
 see `CLAUDE.md`.
 
 ## Next
-- [ ] Ruler: un-hide `unitRegime` segment labels (currently `font-size: 0`
-  under an `aria-hidden` parent) + add progress dimming for past segments.
 - [ ] Hook: add one sentence on the finite-light-speed mechanism.
 - [ ] Decide mobile treatment for the two-card layout (deferred, not
   assumed to be "the same, just smaller" — see PLAN.md).
@@ -17,6 +15,16 @@ see `CLAUDE.md`.
   `reflections/assignment-1.md` (150–300 words).
 - [ ] `/ship`, then verify the live URL at both viewports.
 
+- [x] Ruler polish: un-hid segment labels, found `overflow: hidden` on
+  `.ruler-segments` was clipping anything extending outside its narrow box
+  (fixed by moving corner-rounding onto the end segments instead of the
+  parent), explored a label-merging/bracket variant, then reverted labels
+  entirely per Matt's review ("I don't think i like the labels for now") —
+  kept the overflow fix and added `.past`/`.current` progress dimming on
+  the segment bar, which Matt didn't object to. `pnpm check` green
+  (typecheck, build, lint, 33 tests). Verified live in Chrome at 1920×1080
+  across several progress values — bar dims/brightens correctly, no
+  visible label text, no regression to callouts or the HUD.
 - [x] Anchor fact redesign: prototyped click-to-reveal "toggle" (Moon) vs.
   always-visible "static" (Sun) side by side, per Matt's request after
   flagging the old pill-button reveal as flat/inconsistent. Matt judged
