@@ -4,6 +4,21 @@ Small rolling working set. Collapse to one line + commit link once done —
 see `CLAUDE.md`.
 
 ## Next
+- [x] Ruler now advances symmetrically at both ends of the track instead of
+  sitting pinned at 0 through the whole title screen: `rulerFraction`/
+  `progressForRulerFraction` (`ruler.ts`) treat the first segment's lower
+  bound as the track's actual start (0), the same way the last segment's
+  upper bound was already the track's actual end (1) — so scrolling through
+  the title now moves the ruler thumb continuously, not just once Moon
+  itself arrives. Also removed the title's 150vh hold (Matt: "scrolling
+  should immediately create movement") — its shrink/fade-out now starts at
+  vh 0 instead of after a static plateau; Moon's entrance timing shifted to
+  match, nothing downstream changed. `pnpm check` green (typecheck, build,
+  lint, 34 tests, two rewritten `ruler.test.ts` assertions for the new
+  boundary behaviour). Verified with a CDP scrub reading the ruler input's
+  live value and the title layer's live computed style — ruler climbs
+  smoothly from progress 0, and title opacity/scale already visibly
+  dropping by progress 0.005.
 - [x] Repositioned all 11 point-source/field-reveal waypoints' measurement
   cards (`CARD_OFFSETS` in `main.ts`) per Matt's explicit per-waypoint
   quadrant call, rather than the previous derived alternating-side rule —

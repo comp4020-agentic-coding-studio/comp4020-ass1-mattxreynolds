@@ -77,21 +77,22 @@ const FOG_FADE_OUT = DURATIONS.exitShrink;
 const CMB_FADE_IN = DURATIONS.fadeIn;
 const CMB_HOLD = 80;
 
-// The title layer holds at a large resting size, then shrinks away while
-// fading — the same "exit: shrink" shape every waypoint uses on its way out
-// (scale 1 -> 0.05, opacity 1 -> 0), just starting from a bigger base scale
-// since the title has no entrance of its own to establish scale from (it's
-// already on screen at t=0). (Matt's final adjustment to this layer: it
-// previously scaled UP while fading, meant to read as the camera pushing
-// through it since it sits nearer than the Moon — reverted because it read
-// as inconsistent with the rest of the site's shrink-to-exit language; this
-// now matches that flow instead.) TITLE_EXIT reuses fadeIn+converge rather
-// than a new constant, just to give the title's own exit the same order of
-// magnitude as every other waypoint's entrance/exit phases.
+// The title shrinks away while fading the instant scrolling starts — no
+// hold beforehand (Matt's follow-up: scrolling should immediately create
+// movement, not sit static for a beat first) — the same "exit: shrink"
+// shape every waypoint uses on its way out (scale 1 -> 0.05, opacity 1 -> 0),
+// just starting from a bigger base scale since the title has no entrance of
+// its own to establish scale from (it's already on screen at t=0). (Matt's
+// earlier adjustment to this layer: it previously scaled UP while fading,
+// meant to read as the camera pushing through it since it sits nearer than
+// the Moon — reverted because it read as inconsistent with the rest of the
+// site's shrink-to-exit language; this now matches that flow instead.)
+// TITLE_EXIT reuses fadeIn+converge rather than a new constant, just to give
+// the title's own exit the same order of magnitude as every other
+// waypoint's entrance/exit phases.
 const TITLE_SCALE = 1.8;
-const TITLE_HOLD = 150;
 const TITLE_EXIT = DURATIONS.fadeIn + DURATIONS.converge;
-const TITLE_EXIT_END = TITLE_HOLD + TITLE_EXIT;
+const TITLE_EXIT_END = TITLE_EXIT;
 
 // Moon doesn't start growing in until the title is almost gone, not
 // concurrently with the title's own fade-out starting (Matt's follow-up
@@ -102,7 +103,7 @@ const TITLE_EXIT_END = TITLE_HOLD + TITLE_EXIT;
 // entrance (fadeIn+converge = TITLE_EXIT, same as everyone else) an end
 // point identical to the old fixed pointStartVh, so nothing downstream
 // (Sun onward) shifts.
-const MOON_ENTRANCE_START = TITLE_HOLD + TITLE_EXIT * 0.85;
+const MOON_ENTRANCE_START = TITLE_EXIT * 0.85;
 
 // The closing text (formerly the standalone `.payoff` section) is one more
 // schedule slot after the CMB, per PLAN.md Task 7. Matt's follow-up
@@ -158,7 +159,6 @@ function buildSiteSchedule() {
     // WAYPOINTS/staged/HUD/ruler/callout machinery entirely.
     title: [
       { vh: 0, scale: TITLE_SCALE, x: 0, y: 0, opacity: 1 },
-      { vh: TITLE_HOLD, scale: TITLE_SCALE, x: 0, y: 0, opacity: 1 },
       { vh: TITLE_EXIT_END, scale: 0.05, x: 0, y: 0, opacity: 0 },
     ],
     "reionization-fog": [

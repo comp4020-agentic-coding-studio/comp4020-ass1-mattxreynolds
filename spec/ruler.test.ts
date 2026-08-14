@@ -43,10 +43,28 @@ describe("ruler: fraction mapping", () => {
     expect(rulerFraction(1, simple)).toBe(1);
   });
 
-  it("lands exactly at each real waypoint's boundary", () => {
+  it("lands exactly at each real waypoint's boundary, except the first", () => {
+    // Every waypoint but the first arrives exactly at its own segment's top
+    // edge. The first (moon) doesn't: its segment's lower bound is the very
+    // start of the track (progress 0), not moon's own `from`, so the ruler
+    // is already partway through segment 0 by the time moon itself settles
+    // — the same way the last segment's upper bound is the track's end, not
+    // the last waypoint's own `from` (see the "keeps advancing" test below).
     staged.forEach((w, i) => {
+      if (i === 0) return;
       expect(rulerFraction(w.from ?? 0, staged)).toBeCloseTo(i / staged.length, 10);
     });
+  });
+
+  it("already advances during the title (before the first waypoint's `from`), the same way it keeps advancing during the closing text (after the last waypoint's `from`)", () => {
+    const firstFrom = staged[0].from ?? 0;
+    const lastFrom = staged[staged.length - 1].from ?? 0;
+    expect(rulerFraction(0, staged)).toBe(0);
+    expect(rulerFraction(firstFrom / 2, staged)).toBeGreaterThan(0);
+    expect(rulerFraction(firstFrom / 2, staged)).toBeLessThan(rulerFraction(firstFrom, staged));
+    expect(rulerFraction((lastFrom + 1) / 2, staged)).toBeGreaterThan(rulerFraction(lastFrom, staged));
+    expect(rulerFraction((lastFrom + 1) / 2, staged)).toBeLessThan(1);
+    expect(rulerFraction(1, staged)).toBe(1);
   });
 
   it("is the exact inverse of progressForRulerFraction", () => {
@@ -56,8 +74,8 @@ describe("ruler: fraction mapping", () => {
     }
   });
 
-  it("clamps out-of-range fractions to the ends", () => {
-    expect(progressForRulerFraction(-1, staged)).toBe(staged[0].from ?? 0);
+  it("clamps out-of-range fractions to the actual ends of the track", () => {
+    expect(progressForRulerFraction(-1, staged)).toBe(0);
     expect(progressForRulerFraction(2, staged)).toBe(1);
   });
 });
