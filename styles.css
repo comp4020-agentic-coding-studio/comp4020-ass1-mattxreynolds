@@ -124,8 +124,8 @@ nav a {
 
 .layer svg,
 .layer img {
-  width: clamp(12rem, 34vmin, 26rem);
-  height: clamp(12rem, 34vmin, 26rem);
+  width: clamp(14rem, 42vmin, 32rem);
+  height: clamp(14rem, 42vmin, 32rem);
   object-fit: contain;
   filter: drop-shadow(0 0 2rem rgb(255 255 255 / 15%));
 
@@ -146,9 +146,33 @@ nav a {
   filter: none;
 }
 
+/* Sun/Proxima Centauri/Vega: another 50% on top of the base bump above,
+   per Matt's follow-up sizing pass. */
+.layer[data-id="sun"] img,
+.layer[data-id="proxima-centauri"] img,
+.layer[data-id="vega"] img {
+  width: clamp(21rem, 63vmin, 48rem);
+  height: clamp(21rem, 63vmin, 48rem);
+}
+
+/* Sagittarius A* onward (waypoint 5+) are the "field reveal" and
+   deep-field waypoints — bigger objects/fields, so they get a further size
+   bump on top of the base bump above (doubled again per Matt's follow-up
+   sizing pass — clamp scales linearly, so doubling all three arguments
+   doubles the rendered size at every viewport). */
+.layer[data-id="sagittarius-a"] img,
+.layer[data-id="andromeda"] img,
+.layer[data-id="virgo-cluster"] img,
+.layer[data-id="3c273"] img,
+.layer[data-id="gn-z11"] img,
+.layer[data-id="jades-gs-z14-0"] img {
+  width: clamp(36rem, 104vmin, 80rem);
+  height: clamp(36rem, 104vmin, 80rem);
+}
+
 .layer[data-id="cmb"] img {
-  width: clamp(20rem, 80vmin, 55rem);
-  height: clamp(20rem, 80vmin, 55rem);
+  width: clamp(24rem, 90vmin, 64rem);
+  height: clamp(24rem, 90vmin, 64rem);
 }
 
 .hud {
