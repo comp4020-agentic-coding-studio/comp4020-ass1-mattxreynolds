@@ -10,6 +10,7 @@ import q3c273Img from "./assets/3c273.png";
 import sunImg from "./assets/sun.png";
 import vegaImg from "./assets/vega.png";
 import virgoImg from "./assets/virgo-cluster.png";
+import { uniformStarfield } from "./starfield";
 import { WAYPOINTS } from "./waypoints";
 import { clampProgress, currentWaypoint, interpLayer, type LayerFrame } from "./zoom";
 
@@ -27,7 +28,9 @@ import { clampProgress, currentWaypoint, interpLayer, type LayerFrame } from "./
 // then fades out exactly as the CMB fades in (a synchronised crossfade at
 // t=0.917-0.955), and the CMB then holds at full opacity through the end of
 // the track (interpLayer holds the last keyframe past its t) rather than
-// fading out, so it's still on screen as `.payoff` begins.
+// fading out, so it's still on screen as `.payoff` begins. A separate,
+// generic starfield backdrop (see STARFIELD_FRAMES) sits behind every layer
+// from the very start and fades out over the fog's own fade-in window.
 const LAYER_MARKUP: Record<string, string> = {
   moon: `<img src="${moonImg}" alt="The Moon" />`,
   sun: `<img src="${sunImg}" alt="The Sun" />`,
@@ -130,7 +133,18 @@ const LAYER_FRAMES: Record<string, LayerFrame[]> = {
   ],
 };
 
+// A generic starfield backdrop sits behind every waypoint from t=0, then
+// fades out over exactly the reionization fog's own fade-in window
+// (t=0.788 to t=0.871, matching "reionization-fog" above) — the fog is what
+// finally has no stars left showing through it.
+const STARFIELD_FRAMES: LayerFrame[] = [
+  { t: 0, scale: 1, x: 0, y: 0, opacity: 1 },
+  { t: 0.788, scale: 1, x: 0, y: 0, opacity: 1 },
+  { t: 0.871, scale: 1, x: 0, y: 0, opacity: 0 },
+];
+
 const track = document.querySelector<HTMLElement>('[data-testid="track"]');
+const starfieldEl = document.querySelector<HTMLElement>('[data-testid="starfield"]');
 const layersEl = document.querySelector<HTMLElement>('[data-testid="layers"]');
 const status = document.querySelector<HTMLElement>('[data-testid="status"]');
 const hudName = document.querySelector<HTMLElement>('[data-testid="hud-name"]');
@@ -139,6 +153,12 @@ const hudLookback = document.querySelector<HTMLElement>('[data-testid="hud-lookb
 const hudAnchor = document.querySelector<HTMLElement>('[data-testid="hud-anchor"]');
 
 const staged = WAYPOINTS.filter((w) => w.from !== undefined && LAYER_FRAMES[w.id]);
+
+if (starfieldEl) {
+  starfieldEl.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      ${uniformStarfield({ seed: 11 })}
+    </svg>`;
+}
 
 if (track && layersEl) {
   const layerEls = new Map<string, HTMLElement>();
@@ -158,6 +178,10 @@ if (track && layersEl) {
     const trackTop = window.scrollY + rect.top;
     const scrollable = track.offsetHeight - window.innerHeight;
     const progress = clampProgress(scrollable > 0 ? (window.scrollY - trackTop) / scrollable : 0);
+
+    if (starfieldEl) {
+      starfieldEl.style.opacity = String(interpLayer(STARFIELD_FRAMES, progress).opacity);
+    }
 
     for (const waypoint of staged) {
       const layer = layerEls.get(waypoint.id);

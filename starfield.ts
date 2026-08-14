@@ -249,6 +249,26 @@ export function surfaceTexture(opts: {
 }
 
 /**
+ * Ambient backdrop starfield: sparse dots scattered uniformly across the
+ * whole frame, not clustered into any body. Sits behind every waypoint from
+ * the start of the track and fades out as the reionization fog fades in —
+ * the fog is the thing that finally has no stars left to show through it.
+ */
+export function uniformStarfield(opts: { seed: number; count?: number }): string {
+  const { seed, count = 420 } = opts;
+  const rand = mulberry32(seed);
+  const dots: Dot[] = [];
+  for (let i = 0; i < count; i++) {
+    const cx = rand() * 100;
+    const cy = rand() * 100;
+    const r = 0.05 + Math.pow(rand(), 3) * 0.3;
+    const opacity = 0.2 + rand() * 0.6;
+    dots.push({ cx, cy, r, fill: lerpColor(COOL, WARM, rand() * 0.3), opacity });
+  }
+  return dots.map(dotMarkup).join("\n      ");
+}
+
+/**
  * Cluster of galaxies (Virgo Cluster): each member galaxy is itself a small
  * dot-cluster rather than a single flat circle, so the whole composition
  * reads as many tiny stars grouped into many small galaxies, grouped again
