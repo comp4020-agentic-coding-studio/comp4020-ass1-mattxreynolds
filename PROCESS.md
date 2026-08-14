@@ -37,6 +37,23 @@ landed in the **harness** rather than in another prompt --- a rule added to
 passes is the routine case, and changing what the agent works against is the
 skilled one.
 
+### Rebuilding the zoom mechanic after rejection
+
+The first proof slice used discrete IntersectionObserver fade-ins, one per
+section --- built, checked, and presented for review. I rejected it: it read
+as a slideshow, not the continuous "looking further out is looking further
+back in time" feeling the piece needed. Rather than patch the fade
+transitions, the agent rebuilt the whole rendering model as a single
+continuous scroll-progress value driving per-object keyframe layers in a
+sticky stage, with no scroll-jacking --- a plain native `scroll` listener is
+the only input, so the transform is the only synthetic part. It proved the
+new mechanic on the smallest meaningful slice (Moon → Sun) against a concrete
+worked example I'd given for the entrance grammar, before touching the other
+ten waypoints, and I reviewed and approved that slice live. That the
+two-waypoint slice needed no changes when scaled to all twelve waypoints
+later is what told me the rebuild, not just a patch, was the right call
+([`cd94222`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-mattxreynolds/commit/cd94222)).
+
 Cite each moment as a link whose text is the commit hash or range and whose
 target is this repo's commit or compare URL, so a reader clicks straight to the
 evidence:

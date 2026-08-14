@@ -64,17 +64,25 @@ and see `spec/README.md` for how the checks in this repo relate to it.
   viewports --- at meaningful completion checkpoints, including final
   completion, not after every step along the way.
 - **`PLAN.md` holds current decisions, not history.** Keep only the
-  durable decisions a fresh session needs to continue correctly. When a
-  decision is superseded, replace or summarise it in place --- don't append
-  another historical layer. Implementation history belongs in Git and,
-  where meaningful to the process, `PROCESS.md`.
+  durable decisions a fresh session needs to continue correctly, written as
+  if today were the first day anyone read them. A concrete test for any
+  sentence you're about to add or keep: if it only makes sense *with* the
+  history of how you got there --- "originally X, changed to Y because...",
+  "was Z, retuned again after..." --- it's history, not a decision, and
+  belongs in the commit message or `PROCESS.md` instead. When a decision is
+  superseded, replace it in place in the same commit that supersedes it ---
+  don't append another layer on top of the old one and don't leave the
+  rewrite for later.
 - **`TASKS.md` is a small rolling working set.** Keep the current task
   (bounded, with a concise observable completion condition), the next few
-  meaningful tasks, and any open blockers or unresolved decisions. Once a
-  task is committed, collapse it to one line pointing at that commit ---
-  drop the implementation notes, reasoning, test output, viewport
-  measurements, and verification logs; that detail lives in the commit and
-  `PROCESS.md`.
+  meaningful tasks, and any open blockers or unresolved decisions.
+  Collapsing a finished task to one line + commit link is part of the
+  commit that finishes it, not a follow-up --- if a commit closes out a
+  task, collapse its `TASKS.md` entry in that same commit. Drop the
+  implementation notes, reasoning, test output, viewport measurements, and
+  verification logs when you collapse it; that detail belongs in the commit
+  message and, if it's a candidate moment, `PROCESS.md`'s running list (see
+  below) --- never left to accumulate in `TASKS.md` itself.
 
 ## The checks (your sensors)
 
@@ -175,6 +183,17 @@ means building legibly is part of building well.
   `pnpm check:evidence` verifies your citations resolve to real commits before
   you ship. Markers follow those citations and don't trawl the repo for evidence
   you didn't cite.
+- **Keep a running list of candidate moments, not just the final one.** When
+  something happens that could become one of `PROCESS.md`'s moments --- a
+  correction, a bug you found and fixed, a decision grounded in review ---
+  add it as a rough entry in `PROCESS.md` in the same commit where it
+  happens, rough prose is fine. Commit a screenshot alongside it if one
+  would carry the verification better than a sentence would. Add liberally;
+  over-collecting costs nothing here since the list gets culled, not graded
+  directly. Near the end, cull the running list down to the strongest few
+  that each do all four jobs above and cut the rest --- the culling is
+  itself a judgement call worth making deliberately, not leaving to
+  whatever's left at the deadline.
 - **Write your reflection in `reflections/`** --- a short markdown file in this
   repo, named for the deliverable it answers, so the number in the filename is
   the number in this repo's name (`crit-1.md` in `comp4020-crit1-<you>`,
