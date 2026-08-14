@@ -363,6 +363,18 @@ nav a {
   cursor: pointer;
 }
 
+/* Mobile-only "what is this?" card — desktop's identity tooltip only shows
+   on hover (see wireIdentityHover in main.ts), which has no touch
+   equivalent, so mobile gets an always-rendered card instead, sized and
+   styled like the desktop hover card (.callout-identity) but sitting in the
+   blank space above the image rather than following the cursor. Hidden
+   outside the mobile breakpoint entirely, and hidden by default even inside
+   it — main.ts only reveals it for waypoints in MOBILE_IDENTITY_IDS (Moon
+   only for now, proved before rolling out further). */
+.identity-mobile {
+  display: none;
+}
+
 @media (width <= 767px) {
   /* Horizontal bar under the header instead of desktop's vertical
      right-side strip — Matt asked for this so the images get the reclaimed
@@ -437,6 +449,39 @@ nav a {
   .layer[data-id="cmb"] img {
     width: min(92vw, 64rem);
     height: min(92vw, 64rem);
+  }
+
+  /* Small floating card in the blank space between the ruler and the image
+     (Matt's explicit call over a full-width top sheet) — same visual
+     language as the desktop hover card (compact, translucent, rounded)
+     rather than the bottom sheet's full-width treatment. A fixed screen
+     position rather than one tracked to the image's own live offset, same
+     idea as the bottom-sheet HUD below. */
+  .identity-mobile {
+    display: block;
+    position: absolute;
+    top: 5.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 16rem;
+    padding: 0.75rem 1rem;
+    background: rgb(5 5 10 / 65%);
+    border-radius: 0.5rem;
+    text-align: center;
+  }
+
+  .identity-mobile-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.55;
+    margin: 0 0 0.35rem;
+  }
+
+  .identity-mobile-text {
+    font-size: 0.95rem;
+    margin: 0;
   }
 
   /* Full-width bottom-sheet HUD design, all 12 waypoints — proved on Moon
@@ -613,6 +658,7 @@ nav a {
     display: none;
   }
 }
+
 
 /* Scoped to `.track` being in view (toggled in main.ts render()) so
    `.payoff`, where the ruler has no meaning, keeps a normal scrollbar —

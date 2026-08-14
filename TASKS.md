@@ -94,6 +94,28 @@ see `CLAUDE.md`.
   (typecheck, build, lint, 34 tests). Verified live in Chrome at 390×844
   across all 6 affected waypoints plus CMB — all settle within the
   viewport with margin, no cropping. See `a3d9583`.
+- [x] Built the mobile "what is this?" floating card, proved on Moon only.
+  Desktop's identity tooltip only appears on hover, which has no touch
+  equivalent, so mobile gets an always-rendered card instead
+  (`identity-mobile` in `index.html`, wired in `main.ts`), sized and styled
+  like the desktop hover card (compact, translucent, rounded) rather than
+  the bottom sheet's full-width treatment — Matt's explicit choice over a
+  full-width top card. Sits at a fixed position in the blank space between
+  the ruler and the image (not tracked to the image's own live offset, same
+  idea as the bottom-sheet HUD), and fades with the current waypoint's own
+  opacity rather than snapping on/off, so it crossfades the same way the
+  desktop card fades in on hover. Scoped to Moon alone via a
+  `MOBILE_IDENTITY_IDS` set, mirroring the earlier `HUD_SHEET_IDS`
+  proof-then-rollout pattern. Found and fixed a source-order CSS bug along
+  the way: the base `.identity-mobile { display: none; }` rule was placed
+  after the mobile media query that un-hides it, so it always won
+  regardless of viewport — moved it before that block. `pnpm check` green
+  (typecheck, build, lint, 34 tests). Verified live in Chrome at 390×844: a
+  progress scrub confirms the card stays hidden through the title screen,
+  fades in as Moon's own opacity rises, crossfades out in step with Moon
+  during the Moon→Sun transition, and stays hidden on every other waypoint.
+  Spot-checked 1920×1080 — `display: none` confirmed computed, no visual
+  change from the pre-existing desktop layout.
 - [x] Reworked the mobile ruler into a horizontal bar under the header
   instead of desktop's vertical right-side strip, reclaiming the vertical
   space Matt flagged as wasted on a narrow/tall viewport. `ruler.ts`'s

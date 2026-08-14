@@ -151,6 +151,16 @@ const hudAnchor = document.querySelector<HTMLElement>('[data-testid="hud-anchor"
 const rulerSegmentsEl = document.querySelector<HTMLElement>('[data-testid="ruler-segments"]');
 const rulerInput = document.querySelector<HTMLInputElement>('[data-testid="ruler-input"]');
 const calloutsEl = document.querySelector<HTMLElement>('[data-testid="callouts"]');
+const identityMobileEl = document.querySelector<HTMLElement>('[data-testid="identity-mobile"]');
+const identityMobileText = document.querySelector<HTMLElement>('[data-testid="identity-mobile-text"]');
+
+// Mobile-only "what is this?" card: desktop's identity tooltip only appears
+// on hover (see wireIdentityHover), which doesn't exist on touch, so mobile
+// gets its own always-rendered card in the blank space above the image
+// instead, fading with the object's own opacity like the desktop card fades
+// in on hover. Proved on Moon alone first (see TASKS.md) before rolling out
+// to the rest, same as the bottom-sheet HUD.
+const MOBILE_IDENTITY_IDS = new Set(["moon"]);
 
 // `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint
 // data — it's computed by the schedule generator (see site-schedule.ts) and
@@ -383,6 +393,20 @@ if (track && layersEl) {
       // taken over), this is "we've reached the closing beat" — true on every
       // viewport, so it can't ride the same desktop-gated CSS rule.
       hudEl.classList.toggle("hud-ended", progress >= SITE_SCHEDULE.hudExitStart);
+    }
+
+    if (identityMobileEl && identityMobileText) {
+      const state = stateMap.get(current.id);
+      const visible =
+        MOBILE_IDENTITY_IDS.has(current.id) &&
+        Boolean(current.whatIsIt) &&
+        (state?.opacity ?? 0) > 0.01 &&
+        progress < SITE_SCHEDULE.hudExitStart;
+      identityMobileEl.hidden = !visible;
+      if (visible && state) {
+        identityMobileText.textContent = current.whatIsIt ?? "";
+        identityMobileEl.style.opacity = String(state.opacity);
+      }
     }
 
     // Each callout crossfades on its own object's own fade, rather than
