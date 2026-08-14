@@ -372,6 +372,28 @@ nav a {
     right: 0.75rem;
   }
 
+  /* Sagittarius A* onward's desktop size bump (base clamp's 36rem/24rem
+     floors, set for desktop headroom) exceeds a phone viewport outright —
+     576px/384px floors against a 390px-wide screen, cropping the image at
+     both edges regardless of the vmin-based preferred value. Re-derive as a
+     share of viewport width instead of a fixed rem floor so it always fits,
+     while keeping the max size these waypoints already had for wider
+     phones/small tablets near the 767px breakpoint. */
+  .layer[data-id="sagittarius-a"] img,
+  .layer[data-id="andromeda"] img,
+  .layer[data-id="virgo-cluster"] img,
+  .layer[data-id="3c273"] img,
+  .layer[data-id="gn-z11"] img,
+  .layer[data-id="jades-gs-z14-0"] img {
+    width: min(92vw, 80rem);
+    height: min(92vw, 80rem);
+  }
+
+  .layer[data-id="cmb"] img {
+    width: min(92vw, 64rem);
+    height: min(92vw, 64rem);
+  }
+
   /* Full-width bottom-sheet HUD design, all 12 waypoints — proved on Moon
      alone first (see TASKS.md), then rolled out once Matt confirmed the
      permanently-expanded card (no collapse/expand) over the old compact
