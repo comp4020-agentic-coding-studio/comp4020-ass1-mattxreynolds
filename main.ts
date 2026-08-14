@@ -330,6 +330,33 @@ if (track && layersEl) {
     return { rect, trackTop, scrollable };
   };
 
+  // How far off-screen a "sibling" waypoint's entrance offset (see
+  // schedule.ts's ENTRANCE_X/Y comment) needs to be depends on that
+  // waypoint's own rendered image width as a share of the viewport — the
+  // three CSS size classes (moon/medium/big) and the mobile media query's rem
+  // vs. vw-share floors all render differently. `offsetWidth` reflects that
+  // live, viewport-driven CSS size (unaffected by the transform's `scale`,
+  // which only affects paint, not layout), so measuring it here means the
+  // sliver visible at entrance stays consistent across size class and
+  // viewport without hand-tuning a constant per waypoint. It only needs
+  // re-measuring on resize, not every scroll frame, since it's driven by CSS
+  // clamp()/media-query values, not scroll position.
+  const baseHalfWidthVw = new Map<string, number>();
+  const measureEntranceHalfWidths = () => {
+    for (const [id, layer] of layerEls) {
+      const img = layer.querySelector<HTMLElement>("img");
+      if (!img) continue;
+      baseHalfWidthVw.set(id, (img.offsetWidth / window.innerWidth) * 50);
+    }
+  };
+  measureEntranceHalfWidths();
+
+  // The vw of a "sibling" waypoint's own image left visible at its most
+  // oversized (entrance/exit) moment — small enough to read as "just the
+  // edge", not so small the sliver disappears entirely at the more modest
+  // mid-entrance scale.
+  const ENTRANCE_PEEK_VW = 4;
+
   // Title/closing (see LAYER_FRAMES.title/.closing in site-schedule.ts) rest
   // at TITLE_SCALE/CLOSING_SCALE, a resting scale tuned for desktop's
   // headroom: their text box is capped at 32rem (see .layer-title/.layer-closing
@@ -397,7 +424,13 @@ if (track && layersEl) {
     for (const waypoint of staged) {
       const layer = layerEls.get(waypoint.id);
       if (!layer) continue;
-      const state = interpLayer(LAYER_FRAMES[waypoint.id], progress);
+      const rawState = interpLayer(LAYER_FRAMES[waypoint.id], progress);
+      // rawState.x/y are the unit direction from schedule.ts (0 for
+      // non-"sibling" entrances) — scale by this waypoint's own measured
+      // half-width so the same small sliver shows at entrance regardless of
+      // its CSS size class or the current viewport's clamp/media-query floor.
+      const magnitude = 50 - ENTRANCE_PEEK_VW + (baseHalfWidthVw.get(waypoint.id) ?? 0) * rawState.scale;
+      const state = { ...rawState, x: rawState.x * magnitude, y: rawState.y * magnitude };
       stateMap.set(waypoint.id, state);
       layer.style.transform = `translate(${state.x}vw, ${state.y}vh) scale(${state.scale})`;
       layer.style.opacity = String(state.opacity);
@@ -566,6 +599,11 @@ if (track && layersEl) {
   render();
   window.addEventListener("scroll", render, { passive: true });
   window.addEventListener("resize", () => {
+    // Re-measure before restoring scroll/re-rendering: a resize can cross the
+    // 768px mobile breakpoint or otherwise change what each image's CSS
+    // clamp()/media query resolves to, so the entrance-offset magnitude needs
+    // fresh numbers, not the ones from the old viewport.
+    measureEntranceHalfWidths();
     // Restore the pre-resize progress against the new metrics, rather than
     // just re-rendering at whatever scrollY the resize happened to leave us
     // at — see lastProgress's comment above.

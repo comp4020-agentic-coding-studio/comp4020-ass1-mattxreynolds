@@ -68,8 +68,18 @@ export interface Schedule {
 
 const OVERSIZED_SCALE: Record<"sibling" | "field-reveal", number> = { sibling: 2.2, "field-reveal": 2.6 };
 const MID_SCALE: Record<"sibling" | "field-reveal", number> = { sibling: 2.0, "field-reveal": 2.4 };
-const ENTRANCE_X = 50;
-const ENTRANCE_Y = 7;
+// x/y here are a unit direction, not a vw/vh magnitude: how much of a
+// "sibling" waypoint's own image pokes onto screen at entrance depends on
+// that image's actual rendered size (its CSS size class, and whether the
+// current viewport clamps it to a rem floor or a vmin/vw share), which this
+// module has no access to — it only lays out timing/shape. main.ts's render
+// loop multiplies this unit by a live, per-layer, per-viewport magnitude (see
+// its ENTRANCE_PEEK_VW) so every waypoint shows the same small sliver of
+// itself regardless of size group or viewport, instead of a flat vw/vh
+// constant that was tuned against one waypoint's image and left far more
+// than a sliver showing for larger ones (or on a narrower viewport).
+const ENTRANCE_X = 1;
+const ENTRANCE_Y = 0.14;
 const MID_OFFSET_FRACTION = 0.8;
 
 /**
