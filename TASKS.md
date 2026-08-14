@@ -4,6 +4,21 @@ Small rolling working set. Collapse to one line + commit link once done —
 see `CLAUDE.md`.
 
 ## Next
+- [x] Ruler now spans almost the full viewport height (`--ruler-height`:
+  `min(60vh, 28rem)` → `min(92vh, 68rem)` desktop, `min(55vh, 24rem)` →
+  `min(88vh, 44rem)` mobile), moved onto the `.ruler` container itself via a
+  new `.ruler-track` flex child so `.ruler-segments`/`.ruler-input` no longer
+  need their own height variable. Added fixed "NOW"/"THE WALL" text labels
+  above/below the track (icons considered and rejected — the site has no
+  icon usage anywhere, and "the wall" is already the closing copy's own
+  term). Prototyped a small `.ruler-endcap` dot above "THE WALL" too, but
+  Matt asked to remove it after review — deleted the element and its
+  now-unused `--wall-color` token/rule. `pnpm check` green throughout
+  (typecheck, build, lint, 34 tests, unchanged — CSS/HTML only). Verified
+  with CDP screenshots at both 1920×1080 and 390×844 at mid-scroll, and at
+  1920×1080 at the very start (title) and very end (closing) — thumb
+  reaches each end exactly, labels never overlap the title/closing text,
+  and the endcap is confirmed gone in a final screenshot.
 - [x] Ruler now advances symmetrically at both ends of the track instead of
   sitting pinned at 0 through the whole title screen: `rulerFraction`/
   `progressForRulerFraction` (`ruler.ts`) treat the first segment's lower

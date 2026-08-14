@@ -31,17 +31,20 @@
             </p>
           </div>
           <div class="ruler" data-testid="ruler">
-            <div class="ruler-segments" data-testid="ruler-segments"></div>
-            <div class="ruler-endcap" data-testid="ruler-endcap" aria-hidden="true"></div>
-            <input
-              type="range"
-              class="ruler-input"
-              data-testid="ruler-input"
-              min="0"
-              max="1"
-              step="0.0001"
-              aria-label="Scroll position along the depth track"
-            />
+            <p class="ruler-label" aria-hidden="true">Now</p>
+            <div class="ruler-track">
+              <div class="ruler-segments" data-testid="ruler-segments"></div>
+              <input
+                type="range"
+                class="ruler-input"
+                data-testid="ruler-input"
+                min="0"
+                max="1"
+                step="0.0001"
+                aria-label="Scroll position along the depth track"
+              />
+            </div>
+            <p class="ruler-label" aria-hidden="true">The wall</p>
           </div>
           <div class="callouts" data-testid="callouts"></div>
           <div class="hud" data-testid="hud">
