@@ -4,6 +4,14 @@ Small rolling working set. Collapse to one line + commit link once done —
 see `CLAUDE.md`.
 
 ## Next
+- [x] Reworked jades→fog and fog→CMB transition timing: both now reuse the
+  same `DURATIONS.exitShrink`/`fadeIn` and `GAPS.sibling` overlap as every
+  sibling transition on the site, instead of a bespoke early fade-in start
+  and a fully-simultaneous 75vh crossfade — Matt flagged the old timing had
+  "way more overlap than others." See `PLAN.md`. `pnpm check` green
+  (typecheck, build, lint, 33 tests). Verified with a CDP opacity-scrub
+  script across both transitions: outgoing drops ≤0.1 well before incoming
+  reaches ≥0.9, matching the rest of the site's transitions.
 - [x] Reworked the final 2 waypoints (reionization fog, CMB) onto the same
   2-card diegetic callout system as the other 10 (`whatIsIt` copy +
   `CARD_OFFSETS` in `main.ts`). Split the old single gated-ids set into

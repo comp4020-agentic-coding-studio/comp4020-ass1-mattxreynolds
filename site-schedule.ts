@@ -58,14 +58,23 @@ const POINT_SOURCE_SLOTS: SlotSpec[] = [
 // full-bleed, opacity-only backdrop ramps — so they sit outside
 // buildSchedule's sibling/field-reveal grammar and are appended by hand,
 // timed off the point-source schedule's own cursor so the whole journey is
-// still one source of truth. Both holds trimmed slightly (250 -> 210,
-// 160 -> 135) alongside DURATIONS.hold, for the same reason: these are
-// static, nothing-changing beats too, not fade/crossfade phases. Cut again
-// alongside DURATIONS/GAPS above, holds proportionally more than the
-// crossfade, for the same site-wide "less scrolling" pass.
+// still one source of truth. The jades->fog and fog->cmb handoffs reuse
+// DURATIONS.exitShrink/fadeIn and GAPS.sibling directly for their fade-out,
+// fade-in, and gap, rather than bespoke values, so both overlap by the same
+// small amount as every sibling transition on the site (Matt's follow-up
+// feedback: they used to have "way more overlap than others" — fog's
+// fade-in used to start the instant JADES's own exit-shrink began, and
+// fog/CMB used to crossfade as one literal simultaneous ramp, both of which
+// left outgoing and incoming fully visible together for most of the
+// transition). Both holds trimmed slightly (250 -> 210, 160 -> 135)
+// alongside DURATIONS.hold, for the same reason: these are static,
+// nothing-changing beats too. Cut again alongside DURATIONS/GAPS above,
+// holds proportionally more than the fades, for the same site-wide "less
+// scrolling" pass.
 const FOG_FADE_IN = 75;
 const FOG_HOLD = 120;
-const FOG_CMB_CROSSFADE = 75;
+const FOG_FADE_OUT = DURATIONS.exitShrink;
+const CMB_FADE_IN = DURATIONS.fadeIn;
 const CMB_HOLD = 80;
 
 // The title layer holds at a large resting size, then shrinks away while
@@ -123,13 +132,21 @@ function buildSiteSchedule() {
   const jadesHoldEnd = jadesFrames[3].vh;
   const jadesExitEnd = jadesFrames[4].vh;
 
-  // The fog starts closing in the moment the last galaxy begins its exit —
-  // it's an atmospheric shift, not a competing point-object, so it doesn't
-  // need the sibling/field-reveal gap treatment.
-  const fogFadeInEnd = jadesHoldEnd + FOG_FADE_IN;
+  // Fog starts fading in GAPS.sibling vh before JADES's own exit-shrink
+  // finishes, the same small overlap every sibling handoff gets — not at
+  // the moment JADES's exit begins, which used to leave both fully visible
+  // together for most of fog's fade-in.
+  const fogFadeInStart = jadesExitEnd + GAPS.sibling;
+  const fogFadeInEnd = fogFadeInStart + FOG_FADE_IN;
   const fogHoldEnd = fogFadeInEnd + FOG_HOLD;
-  const crossfadeEnd = fogHoldEnd + FOG_CMB_CROSSFADE;
-  const cmbSettledEnd = crossfadeEnd + CMB_HOLD;
+  // Fog fades back out over the same exitShrink duration every waypoint's
+  // own exit uses, and CMB fades in behind it over the same fadeIn
+  // duration, with the same GAPS.sibling overlap — not one 75vh
+  // simultaneous crossfade.
+  const fogFadeOutEnd = fogHoldEnd + FOG_FADE_OUT;
+  const cmbFadeInStart = fogFadeOutEnd + GAPS.sibling;
+  const cmbFadeInEnd = cmbFadeInStart + CMB_FADE_IN;
+  const cmbSettledEnd = cmbFadeInEnd + CMB_HOLD;
   const cmbFadeOutEnd = cmbSettledEnd + CMB_FADE_OUT;
   const closingStart = cmbSettledEnd + CMB_FADE_OUT * 0.85;
   const totalVh = closingStart + CLOSING_FADE_IN;
@@ -145,16 +162,16 @@ function buildSiteSchedule() {
       { vh: TITLE_EXIT_END, scale: 0.05, x: 0, y: 0, opacity: 0 },
     ],
     "reionization-fog": [
-      { vh: jadesHoldEnd, scale: 1, x: 0, y: 0, opacity: 0 },
+      { vh: fogFadeInStart, scale: 1, x: 0, y: 0, opacity: 0 },
       { vh: fogFadeInEnd, scale: 1, x: 0, y: 0, opacity: 1 },
       { vh: fogHoldEnd, scale: 1, x: 0, y: 0, opacity: 1 },
-      { vh: crossfadeEnd, scale: 1, x: 0, y: 0, opacity: 0 },
+      { vh: fogFadeOutEnd, scale: 1, x: 0, y: 0, opacity: 0 },
     ],
     // Settles at full opacity, holds, then fades back OUT — the ending is the
     // text alone, not the text overlaid on a wall that never leaves.
     cmb: [
-      { vh: fogHoldEnd, scale: 1, x: 0, y: 0, opacity: 0 },
-      { vh: crossfadeEnd, scale: 1, x: 0, y: 0, opacity: 1 },
+      { vh: cmbFadeInStart, scale: 1, x: 0, y: 0, opacity: 0 },
+      { vh: cmbFadeInEnd, scale: 1, x: 0, y: 0, opacity: 1 },
       { vh: cmbSettledEnd, scale: 1, x: 0, y: 0, opacity: 1 },
       { vh: cmbFadeOutEnd, scale: 1, x: 0, y: 0, opacity: 0 },
     ],
@@ -170,11 +187,12 @@ function buildSiteSchedule() {
   };
 
   const from = new Map(point.from);
-  // The fog becomes the current HUD entry once the previous galaxy is
-  // basically gone (not once the fog itself is half-visible) — it's a
-  // backdrop change, not an arrival.
+  // Fog and CMB each become the current HUD entry once the thing before
+  // them is basically gone (not once they themselves are half-visible) —
+  // it's a backdrop change, not an arrival, the same way every other
+  // waypoint's own exit already reads as "done" before the next is "here".
   from.set("reionization-fog", jadesExitEnd);
-  from.set("cmb", (fogHoldEnd + crossfadeEnd) / 2);
+  from.set("cmb", fogFadeOutEnd);
 
   const schedule = normalizeSchedule({ frames, from, endVh: totalVh }, totalVh);
 

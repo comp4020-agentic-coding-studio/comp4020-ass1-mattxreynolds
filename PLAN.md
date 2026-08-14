@@ -50,15 +50,19 @@ the stage rather than sit as an object; that was dropped in favour of
 consistency — a single photo per waypoint, just sized differently — see Git
 history for the veil version.)
 
-**Fog → CMB timing (current):** the fog ramps up to full opacity, holds, then
-fades out exactly as the CMB fades in — a synchronised crossfade rather than
-a hard cut, so the wall is reached through dissolving fog rather than a jump
-cut. The CMB then holds at full opacity, then fades back **out** before the
-track ends (revised from an earlier version where it held forever) — the
-ending is the closing text alone on the ordinary dark background, not the
-text permanently overlaid on a wall that never leaves. The closing layer's
-own fade-in starts well before the CMB has fully gone (see above), so there's
-overlap rather than a hard cut to black.
+**Fog → CMB timing (current):** JADES → fog and fog → CMB now use the exact
+same exit-shrink/fade-in durations and the same small `GAPS.sibling` overlap
+as every other waypoint handoff on the site (`site-schedule.ts`), rather than
+a bespoke early start or a single fully-simultaneous crossfade — fog starts
+fading in only once JADES is essentially gone, and CMB starts fading in only
+once fog is essentially gone, so the transition reads the same size as every
+sibling cut rather than standing out with far more overlap. The CMB then
+holds at full opacity, then fades back **out** before the track ends (revised
+from an earlier version where it held forever) — the ending is the closing
+text alone on the ordinary dark background, not the text permanently overlaid
+on a wall that never leaves. The closing layer's own fade-in starts well
+before the CMB has fully gone (see above), so there's overlap rather than a
+hard cut to black.
 
 **Fog/CMB imagery (confirmed with Matt):** `reionization-fog.png` and
 `cmb.png` — the latter is the real Planck all-sky temperature-anisotropy map,
