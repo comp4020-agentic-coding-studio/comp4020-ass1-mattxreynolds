@@ -4,6 +4,17 @@ Small rolling working set. Collapse to one line + commit link once done —
 see `CLAUDE.md`.
 
 ## Next
+- [x] Reworked the final 2 waypoints (reionization fog, CMB) onto the same
+  2-card diegetic callout system as the other 10 (`whatIsIt` copy +
+  `CARD_OFFSETS` in `main.ts`). Split the old single gated-ids set into
+  `HAS_CARD_IDS` (now all 12, drives desktop card + HUD suppression) and
+  `ANCHOR_REVEAL_IDS` (still just the original 10), so their new desktop
+  card doesn't also start gating their anchor behind mobile's legacy
+  reveal-button — see `PLAN.md`. `pnpm check` green (typecheck, build,
+  lint, 33 tests). Verified live in Chrome at 1920×1080 and 390×844: both
+  measurement cards + hover identity tooltips render correctly with no
+  overlap on either waypoint's imagery; mobile unaffected (still
+  full-width HUD, not gated). See `6fc128d`.
 - [ ] Decide mobile treatment for the two-card layout (deferred, not
   assumed to be "the same, just smaller" — see PLAN.md).
 - [ ] Resize-mid-scroll check (not yet done — only fixed-viewport checks so
