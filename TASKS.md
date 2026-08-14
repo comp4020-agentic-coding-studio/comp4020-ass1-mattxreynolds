@@ -116,6 +116,38 @@ see `CLAUDE.md`.
   during the Moon→Sun transition, and stays hidden on every other waypoint.
   Spot-checked 1920×1080 — `display: none` confirmed computed, no visual
   change from the pre-existing desktop layout.
+- [x] Widened the mobile identity card and replaced its fixed-position
+  crossfade with the same "attach to the object" mechanism desktop's
+  measurement cards already use — Matt's explicit feedback after reviewing
+  the Moon-only proof-of-concept. Replaced `MOBILE_IDENTITY_IDS` with a
+  `MOBILE_IDENTITY_OFFSETS` map (`main.ts`, structurally identical to
+  `CARD_OFFSETS`) and mirrored desktop's `positionCard` closure: per frame,
+  the card's `--identity-x`/`--identity-y`/`--identity-scale` custom
+  properties are derived from the object's own live `state.x`/`state.y`/
+  `state.scale` plus a fixed pixel offset, so the card now enters from the
+  same side as the image and grows/shrinks with it instead of just fading
+  in place. Found and fixed a CSS bug along the way: with `left: 50%` and
+  only `max-width` (no explicit `width`) set, the browser's shrink-to-fit
+  auto-width algorithm caps the box at "container width minus left offset"
+  — exactly half the viewport when centered — regardless of `max-width`,
+  so the widened card was clipped flush to the right edge instead of
+  centered. Invisible on desktop's `.callout` cards since their offsets are
+  always large enough that this constraint never binds. Fixed by giving
+  the card an explicit `width: 18rem` (removing the auto-width algorithm
+  entirely) with `max-width: calc(100vw - 2rem)` as a narrow-viewport
+  safety net, and baking `-50%,-50%` self-centering into the transform via
+  `calc(-50% + var(--identity-x, 0px))` since, unlike `.callout`, this card
+  needs to center on its own anchor point rather than hang off to one side.
+  `pnpm check` green (typecheck, build, lint, 34 tests). Verified live in
+  Chrome at 390×844 with a progress scrub: card stays hidden through the
+  title screen; during Moon's entrance it's larger and shifted left in
+  step with the image (e.g. width 323px, x=-126 at p=0.04); narrows and
+  re-centers as the entrance settles (width 288px = 18rem exactly, x=51,
+  right=339 — symmetric 51px margins on a 390px viewport). Screenshots at
+  both the entrance and rest states confirm the card visually slides in
+  attached to the Moon and settles centered above it. Spot-checked
+  1920×1080 — `.identity-mobile` computed `display: none`, no visual
+  change from desktop's existing layout.
 - [x] Reworked the mobile ruler into a horizontal bar under the header
   instead of desktop's vertical right-side strip, reclaiming the vertical
   space Matt flagged as wasted on a narrow/tall viewport. `ruler.ts`'s

@@ -454,16 +454,30 @@ nav a {
   /* Small floating card in the blank space between the ruler and the image
      (Matt's explicit call over a full-width top sheet) — same visual
      language as the desktop hover card (compact, translucent, rounded)
-     rather than the bottom sheet's full-width treatment. A fixed screen
-     position rather than one tracked to the image's own live offset, same
-     idea as the bottom-sheet HUD below. */
+     rather than the bottom sheet's full-width treatment. Tracks the
+     object's own live x/y/scale transform (--identity-x/-y/-scale, set
+     every frame in render() from the same state used for the layer itself)
+     rather than sitting at a fixed screen position, so it "attaches" to the
+     image — sliding in from the same side and growing/shrinking with it,
+     not just fading in place. Unlike the desktop `.callout` cards (which
+     use large asymmetric offsets to clear the image and never need
+     centring), this one needs to stay centred over the image at rest, so
+     it needs its own -50%/-50% self-centring baked into the transform on
+     top of that offset — an explicit `width` rather than `max-width` is
+     required for this to render correctly: an auto-width box anchored at
+     `left: 50%` gets its shrink-to-fit width silently capped to the
+     remaining half of the container (a real, if obscure, quirk of the CSS
+     auto-width algorithm), which pinned it to the right half of the
+     viewport instead of centring it until this was found and fixed. */
   .identity-mobile {
     display: block;
     position: absolute;
-    top: 5.5rem;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    max-width: 16rem;
+    width: 18rem;
+    max-width: calc(100vw - 2rem);
+    transform: translate(calc(-50% + var(--identity-x, 0px)), calc(-50% + var(--identity-y, 0px)))
+      scale(var(--identity-scale, 1));
     padding: 0.75rem 1rem;
     background: rgb(5 5 10 / 65%);
     border-radius: 0.5rem;

@@ -156,11 +156,16 @@ const identityMobileText = document.querySelector<HTMLElement>('[data-testid="id
 
 // Mobile-only "what is this?" card: desktop's identity tooltip only appears
 // on hover (see wireIdentityHover), which doesn't exist on touch, so mobile
-// gets its own always-rendered card in the blank space above the image
-// instead, fading with the object's own opacity like the desktop card fades
-// in on hover. Proved on Moon alone first (see TASKS.md) before rolling out
-// to the rest, same as the bottom-sheet HUD.
-const MOBILE_IDENTITY_IDS = new Set(["moon"]);
+// gets its own always-rendered card instead. Offset (px, from the object's
+// own live screen-space centre) works exactly like CARD_OFFSETS — consumed
+// via the object's live x/y/scale transform, not a static screen position —
+// so the card "attaches" to the image: it slides in from the same side and
+// grows/shrinks the same way, at Matt's request, rather than fading in place.
+// Moon only for now (see TASKS.md) before rolling out to the rest, same as
+// the bottom-sheet HUD.
+const MOBILE_IDENTITY_OFFSETS: Record<string, { x: number; y: number }> = {
+  moon: { x: 0, y: -276 },
+};
 
 // `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint
 // data — it's computed by the schedule generator (see site-schedule.ts) and
@@ -397,15 +402,21 @@ if (track && layersEl) {
 
     if (identityMobileEl && identityMobileText) {
       const state = stateMap.get(current.id);
+      const offset = MOBILE_IDENTITY_OFFSETS[current.id];
       const visible =
-        MOBILE_IDENTITY_IDS.has(current.id) &&
+        Boolean(offset) &&
         Boolean(current.whatIsIt) &&
         (state?.opacity ?? 0) > 0.01 &&
         progress < SITE_SCHEDULE.hudExitStart;
       identityMobileEl.hidden = !visible;
-      if (visible && state) {
+      if (visible && state && offset) {
         identityMobileText.textContent = current.whatIsIt ?? "";
         identityMobileEl.style.opacity = String(state.opacity);
+        const px = (state.x / 100) * window.innerWidth + offset.x;
+        const py = (state.y / 100) * window.innerHeight + offset.y;
+        identityMobileEl.style.setProperty("--identity-x", `${px}px`);
+        identityMobileEl.style.setProperty("--identity-y", `${py}px`);
+        identityMobileEl.style.setProperty("--identity-scale", String(dampedScale(state.scale)));
       }
     }
 
