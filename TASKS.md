@@ -94,6 +94,24 @@ see `CLAUDE.md`.
   (typecheck, build, lint, 34 tests). Verified live in Chrome at 390×844
   across all 6 affected waypoints plus CMB — all settle within the
   viewport with margin, no cropping. See `a3d9583`.
+- [x] Fixed jagged mobile HUD summary-row formatting on later waypoints with
+  longer name/distance text (e.g. Andromeda, CMB). Root cause: `.hud-summary`
+  laid name and distance out as a baseline-aligned flex row with no width
+  constraints, so each wrapped independently — when they wrapped to a
+  different number of lines (Andromeda: name 3 lines, distance 2; CMB: 3
+  and 3 but different shapes), `align-items: baseline` only aligned their
+  first lines, leaving the shorter block floating mid-height next to the
+  taller one. Explored three options with Matt (always stack, top-align
+  instead of baseline, or auto-stack only when wrapping) — he picked always
+  stack for consistency across all 12 waypoints over keeping the
+  side-by-side look for short ones. `.hud-summary` is now `flex-direction:
+  column` instead of a row; dropped the now-unneeded `margin: 0 auto 0 0`
+  on `.hud-distance`. `pnpm check` green (typecheck, build, lint, 34
+  tests). Verified live in Chrome at 390×844: Moon (short text) now stacks
+  tightly instead of side-by-side; Andromeda's distance now fits on one
+  line instead of floating; CMB's name/distance both wrap cleanly on their
+  own full-width lines with no misalignment. Spot-checked 1920×1080 — HUD
+  still `display: none` unconditionally, no visual change.
 - [x] Added a sink-into/grow-from-bottom fade to the mobile HUD (name +
   distance + lookback + anchor), matching the image crossfade it sits
   under instead of the old flat display-toggle. First built by mistake on

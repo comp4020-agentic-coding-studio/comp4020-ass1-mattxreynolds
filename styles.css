@@ -535,10 +535,18 @@ nav a {
     transform: translateY(calc((1 - var(--hud-lift, 1)) * 100%)) scale(var(--hud-lift, 1));
   }
 
+  /* Always stacked, never a side-by-side row: name and distance vary a lot
+     in length across the 12 waypoints ("The Moon" / 384,400 km away vs "The
+     Cosmic Microwave Background" / the edge of the observable universe), and
+     a baseline-aligned row let each wrap independently — waypoints where the
+     two wrapped to different line counts (Andromeda, CMB, ...) ended up with
+     the shorter one floating mid-height next to the taller one. Stacking
+     removes the wrap-count mismatch entirely, at the cost of the compact
+     side-by-side look on short waypoints like Moon/Sun (Matt's call). */
   .hud-summary {
     display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
   .hud-name {
@@ -546,7 +554,7 @@ nav a {
   }
 
   .hud-distance {
-    margin: 0 auto 0 0;
+    margin: 0;
   }
 
   .hud-detail {
