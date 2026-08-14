@@ -77,7 +77,37 @@ see `CLAUDE.md`.
 - [ ] Mobile adaptation, step 6: full mobile regression pass (resize
   mid-scroll, touch-drag ruler thumb, flick-scroll) + re-screenshot
   desktop at fixed progress points to confirm pixel-identical to the
-  pre-mobile-work baseline.
+  pre-mobile-work baseline. Deprioritised for now in favour of three
+  issues Matt flagged after live review: the vertical ruler wasting
+  horizontal space, blank space above the images going unused, and
+  waypoint 5+ images overflowing the viewport (see below).
+- [x] Fixed waypoint 5+ (Sagittarius A* onward) and CMB overflowing the
+  mobile viewport horizontally. Root cause: the base `clamp()` sizing
+  (`36rem`/`24rem` floors, set for desktop headroom) uses `vmin`, which on
+  a narrow/tall phone equals viewport *width* — `104vmin` evaluated to
+  less than the `36rem` (576px) floor on a 390px-wide screen, so the
+  fixed floor won and produced a box far wider than the viewport
+  regardless of the preferred value. Re-derived as `min(92vw, cap)` inside
+  the mobile media query instead, tying the size to actual viewport width
+  so it can never exceed it, while keeping the original larger cap for
+  wider phones/tablets near the 767px breakpoint. `pnpm check` green
+  (typecheck, build, lint, 34 tests). Verified live in Chrome at 390×844
+  across all 6 affected waypoints plus CMB — all settle within the
+  viewport with margin, no cropping. See `a3d9583`.
+- [x] Reworked the mobile ruler into a horizontal bar under the header
+  instead of desktop's vertical right-side strip, reclaiming the vertical
+  space Matt flagged as wasted on a narrow/tall viewport. `ruler.ts`'s
+  progress math is orientation-agnostic (a plain 0–1 fraction), so this
+  was a pure CSS re-layout inside the existing mobile `@media` block: row
+  instead of column layout, segment dividers/end-caps rotated a quarter
+  turn, and the native range input's `writing-mode` dropped from
+  `vertical-lr` back to the horizontal default. `pnpm check` green
+  (typecheck, build, lint, 34 tests). Verified live in Chrome at 390×844:
+  the bar renders correctly under the title, NOW/THE WALL sit left/right
+  of the track, and the thumb tracks scroll position correctly from
+  progress 0 (far left) to progress 1 (far right). Spot-checked 1920×1080
+  — desktop's vertical ruler is byte-identical to before, unaffected by
+  construction.
 - [x] Ruler now spans almost the full viewport height (`--ruler-height`:
   `min(60vh, 28rem)` → `min(92vh, 68rem)` desktop, `min(55vh, 24rem)` →
   `min(88vh, 44rem)` mobile), moved onto the `.ruler` container itself via a

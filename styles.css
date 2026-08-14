@@ -364,12 +364,57 @@ nav a {
 }
 
 @media (width <= 767px) {
-  :root {
-    --ruler-height: min(88vh, 44rem);
+  /* Horizontal bar under the header instead of desktop's vertical
+     right-side strip — Matt asked for this so the images get the reclaimed
+     vertical space on a narrow, tall viewport. ruler.ts's progress math is
+     orientation-agnostic (it only ever deals in a 0-1 fraction), so this is
+     a pure CSS re-layout: row instead of column (NOW/THE WALL naturally
+     land left/right since they're the track's flex siblings in that DOM
+     order), segment dividers/end-caps rotated a quarter turn, and the
+     native range input drops its vertical writing-mode. */
+  .ruler {
+    top: 3.5rem;
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    flex-direction: row;
+    align-items: center;
+    height: auto;
   }
 
-  .ruler {
-    right: 0.75rem;
+  .ruler-track {
+    width: auto;
+    height: 1.5rem;
+  }
+
+  .ruler-segments {
+    inset: 50% 0 auto;
+    transform: translateY(-50%);
+    width: auto;
+    height: 0.35rem;
+    flex-direction: row;
+  }
+
+  .ruler-segment {
+    border-bottom: none;
+    border-right: 1px solid rgb(255 255 255 / 15%);
+  }
+
+  .ruler-segment:first-child {
+    border-radius: 999px 0 0 999px;
+  }
+
+  .ruler-segment:last-child {
+    border-right: none;
+    border-radius: 0 999px 999px 0;
+  }
+
+  .ruler-input {
+    inset: 50% 0 auto;
+    transform: translateY(-50%);
+    width: auto;
+    height: 1.5rem;
+    writing-mode: horizontal-tb;
   }
 
   /* Sagittarius A* onward's desktop size bump (base clamp's 36rem/24rem
