@@ -206,11 +206,10 @@ nav a {
   margin: 0.5rem 0 0;
 }
 
-/* Shared by every waypoint's HUD (see index.html), but only `.hud-sheet`
-   (mobile full-width bottom-sheet design, Moon only for now — see
-   HUD_SHEET_IDS in main.ts) gives it any layout; everywhere else it's
-   hidden, matching the desktop-card treatment (`.callout-anchor-static-label`
-   below) this borrows its "In human terms" framing from. */
+/* Hidden by default (desktop's `.hud` is always suppressed in favour of the
+   diegetic callout below, since every waypoint has one — see hud-suppressed
+   below); the mobile media query shows it, matching the desktop card's own
+   `.callout-anchor-static-label` framing this borrows "In human terms" from. */
 .hud-anchor-label {
   display: none;
 }
@@ -373,15 +372,13 @@ nav a {
     right: 0.75rem;
   }
 
-  /* Full-width bottom-sheet HUD design (Moon only for now, see
-     HUD_SHEET_IDS in main.ts) — Matt preferred this permanently-expanded
-     card over the compact fixed HUD every other waypoint still uses, so
-     unlike the toggling proof-of-concept it replaced, there's no
-     collapsed state: name + distance sit in a summary row, with the
-     lookback + "in human terms" anchor always shown beneath. This whole
-     block only ever applies while `.hud-sheet` is present, so every other
-     waypoint's HUD is unaffected. */
-  .hud.hud-sheet {
+  /* Full-width bottom-sheet HUD design, all 12 waypoints — proved on Moon
+     alone first (see TASKS.md), then rolled out once Matt confirmed the
+     permanently-expanded card (no collapse/expand) over the old compact
+     fixed HUD. Name + distance sit in a summary row; the lookback + "in
+     human terms" anchor always show beneath. Desktop is untouched — this
+     whole block only ever applies inside the mobile media query. */
+  .hud {
     left: 0;
     right: 0;
     bottom: 0;
@@ -390,25 +387,25 @@ nav a {
     padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
   }
 
-  .hud.hud-sheet .hud-summary {
+  .hud-summary {
     display: flex;
     align-items: baseline;
     gap: 0.75rem;
   }
 
-  .hud.hud-sheet .hud-name {
+  .hud-name {
     margin: 0;
   }
 
-  .hud.hud-sheet .hud-distance {
+  .hud-distance {
     margin: 0 auto 0 0;
   }
 
-  .hud.hud-sheet .hud-detail {
+  .hud-detail {
     margin-top: 0.5rem;
   }
 
-  .hud.hud-sheet .hud-anchor-label {
+  .hud-anchor-label {
     display: block;
     font-size: 0.75rem;
     font-weight: 600;
@@ -418,7 +415,7 @@ nav a {
     margin: 0.5rem 0 0.35rem;
   }
 
-  .hud.hud-sheet .hud-anchor {
+  .hud-anchor {
     margin: 0;
   }
 }

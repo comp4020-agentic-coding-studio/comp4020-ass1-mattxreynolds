@@ -152,13 +152,6 @@ const rulerSegmentsEl = document.querySelector<HTMLElement>('[data-testid="ruler
 const rulerInput = document.querySelector<HTMLInputElement>('[data-testid="ruler-input"]');
 const calloutsEl = document.querySelector<HTMLElement>('[data-testid="callouts"]');
 
-// Only Moon uses the full-width bottom-sheet HUD design for now (proof of
-// concept — see `.hud-sheet` in styles.css, mobile-only) — this stays a
-// plain single-id check, not a Set, until it's proven and rolled out to the
-// rest in a later task. Every other waypoint keeps the existing compact
-// fixed HUD untouched.
-const HUD_SHEET_IDS = new Set(["moon"]);
-
 // `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint
 // data — it's computed by the schedule generator (see site-schedule.ts) and
 // merged in here, once, at startup.
@@ -422,7 +415,6 @@ if (track && layersEl) {
 
     if (current.id !== lastId) {
       lastId = current.id;
-      if (hudEl) hudEl.classList.toggle("hud-sheet", HUD_SHEET_IDS.has(current.id));
       if (status) status.textContent = `Now viewing: ${current.name}, light from ${current.lookbackLabel}.`;
     }
   };

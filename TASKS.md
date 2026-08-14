@@ -55,8 +55,25 @@ see `CLAUDE.md`.
   compact always-visible card with no label. Spot-checked 1920×1080: HUD
   stays correctly suppressed on Moon (diegetic card instead), no visual
   change.
-- [ ] Mobile adaptation, step 5: roll bottom-sheet pattern out to the
-  remaining 11 waypoints.
+- [x] Mobile adaptation, step 5: rolled the always-expanded bottom-sheet HUD
+  out to the remaining 11 waypoints. Since it's now the universal design
+  (no waypoint keeps the old compact HUD), folded away the `HUD_SHEET_IDS`
+  set and `.hud-sheet` modifier-class toggle entirely — `main.ts`'s
+  waypoint-change block no longer touches HUD classes at all, and
+  `styles.css` applies the sheet layout directly to the base `.hud`/
+  `.hud-summary`/`.hud-anchor-label` selectors inside the existing mobile
+  `@media` block, since there's no more per-waypoint variation left to
+  scope against. Desktop untouched by construction — the whole block still
+  only ever applies inside the mobile media query, and `hud-suppressed`
+  (all 12 ids now in `HAS_CARD_IDS`) keeps the HUD hidden there in favour
+  of the diegetic card, as before. `pnpm check` green (typecheck, build,
+  lint, 34 tests). Verified live in Chrome at 390×844 across all 12
+  waypoints: each shows the permanently-expanded card with correct name,
+  distance, lookback, "In human terms" label, and anchor text, and the
+  card correctly disappears at the closing beat. Spot-checked 1920×1080 at
+  three waypoints (Moon, Vega, Quasar 3C 273) — HUD stays suppressed
+  everywhere, diegetic callout card renders exactly as before, no visual
+  change from the pre-rollout baseline.
 - [ ] Mobile adaptation, step 6: full mobile regression pass (resize
   mid-scroll, touch-drag ruler thumb, flick-scroll) + re-screenshot
   desktop at fixed progress points to confirm pixel-identical to the
