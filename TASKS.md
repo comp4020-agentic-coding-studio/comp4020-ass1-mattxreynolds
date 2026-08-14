@@ -4,6 +4,17 @@ Small rolling working set. Collapse to one line + commit link once done —
 see `CLAUDE.md`.
 
 ## Next
+- [x] Repositioned all 11 point-source/field-reveal waypoints' measurement
+  cards (`CARD_OFFSETS` in `main.ts`) per Matt's explicit per-waypoint
+  quadrant call, rather than the previous derived alternating-side rule —
+  sun/virgo-cluster/3c273/jades-gs-z14-0/cmb → right side, the rest → left,
+  each also assigned top or bottom explicitly. Followed by two rounds of
+  fine position tuning on sun/proxima-centauri/vega/3c273 per Matt's
+  feedback. `pnpm check` green (typecheck, build, lint, 33 tests). Verified
+  with a CDP script (`find-settled.mjs`) that finds each waypoint's settled
+  scroll-progress fraction from real rendered opacity, then screenshotted
+  every changed waypoint at 1920×1080 at that fraction across all three
+  rounds — every card clears its own image with no overlap or overflow.
 - [x] Reworked jades→fog and fog→CMB transition timing: both now reuse the
   same `DURATIONS.exitShrink`/`fadeIn` and `GAPS.sibling` overlap as every
   sibling transition on the site, instead of a bespoke early fade-in start

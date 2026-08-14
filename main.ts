@@ -25,43 +25,27 @@ import { clampProgress, currentWaypoint, dampedScale, interpLayer, type LayerFra
 // reionization fog and the CMB (Matt's request — they used to stay on the
 // fixed `.hud` permanently; see PLAN.md for the superseded reasoning).
 //
-// The first 10 (point-source) offsets are tuned per waypoint on two axes:
-// (1) clearing the object's own image entirely — large enough magnitude that
-// the card's box doesn't overlap the ~34vmin-wide image at rest, using the
-// open screen space instead of crowding the object — and (2) avoiding each
-// waypoint's own entrance sweep: every sibling-body waypoint's card sits on
-// the side opposite its own LAYER_FRAMES entrance x sign, since a same-side
-// card would sit directly in the path of (or run off-screen with) its own
-// oversized entrance. Field-reveal waypoints (sagittarius-a, virgo-cluster)
-// have no lateral entrance sweep to dodge, so their side just continues the
-// left/right alternation; their offset magnitude is larger to clear the
-// bigger oversized scale (2.6x vs 2.2x) they briefly hold at. Vertical sign
-// alternates between every adjacent pair (not tied to side) so no two
-// waypoints' cards can stack on each other during a crossfade even when they
-// land on the same side.
-//
-// Fog and CMB are neither sibling nor field-reveal — they're full-bleed
-// opacity-only backdrops, frozen at x:0/y:0 the whole time (see
-// site-schedule.ts), so there's no entrance sweep to dodge either. Their
-// offsets are chosen purely by what the rendered image actually looks like:
-// fog has a bright nebula cluster in its upper-right third that a card would
-// clash with, so its card sits lower-left, in the image's darker, emptier
-// region. The CMB's Planck map is a large centred ellipse (up to 64rem) with
-// clear space in its corners; its card sits lower-left too, far enough out
-// to clear the ellipse horizontally even where the two overlap vertically.
+// Every waypoint's magnitude clears its own image at rest — large enough that
+// the card's box doesn't overlap the ~34vmin-wide image (or, for fog/CMB, the
+// full-bleed/oversized backdrop) — but which quadrant (top/bottom-left/right)
+// each card sits in is Matt's explicit per-waypoint call, not a derived rule:
+// moon top-left, sun top-right, proxima-centauri top-left, vega bottom-right,
+// sagittarius-a bottom-left, andromeda bottom-left, virgo-cluster
+// bottom-right, 3c273 bottom-right, gn-z11 bottom-left, jades-gs-z14-0
+// bottom-right, reionization-fog top-left, cmb bottom-right.
 const CARD_OFFSETS: Record<string, { x: number; y: number }> = {
   moon: { x: -460, y: -130 },
-  sun: { x: -480, y: 140 },
-  "proxima-centauri": { x: 460, y: -130 },
-  vega: { x: -460, y: 140 },
-  "sagittarius-a": { x: 500, y: -150 },
-  andromeda: { x: 460, y: 150 },
-  "virgo-cluster": { x: -500, y: -150 },
-  "3c273": { x: -460, y: 140 },
-  "gn-z11": { x: 460, y: -130 },
-  "jades-gs-z14-0": { x: -460, y: 140 },
-  "reionization-fog": { x: -480, y: 170 },
-  cmb: { x: -560, y: 170 },
+  sun: { x: 360, y: -140 },
+  "proxima-centauri": { x: -580, y: -168 },
+  vega: { x: 280, y: 160 },
+  "sagittarius-a": { x: -500, y: 150 },
+  andromeda: { x: -460, y: 150 },
+  "virgo-cluster": { x: 500, y: 150 },
+  "3c273": { x: 240, y: 120 },
+  "gn-z11": { x: -460, y: 130 },
+  "jades-gs-z14-0": { x: 460, y: 140 },
+  "reionization-fog": { x: -480, y: -170 },
+  cmb: { x: 560, y: 170 },
 };
 
 // A single click/tap listener drives every anchor-fact reveal (no hover) —
