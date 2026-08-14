@@ -10,7 +10,7 @@ import q3c273Img from "./assets/3c273.png";
 import sunImg from "./assets/sun.png";
 import vegaImg from "./assets/vega.png";
 import virgoImg from "./assets/virgo-cluster.png";
-import { progressForRulerFraction, rulerFraction, unitRegime } from "./ruler";
+import { progressForRulerFraction, rulerFraction } from "./ruler";
 import { SITE_SCHEDULE } from "./site-schedule";
 import { uniformStarfield } from "./starfield";
 import { WAYPOINTS } from "./waypoints";
@@ -246,13 +246,14 @@ if (track && layersEl) {
   // Moon/Sun callouts) — the equal-length-per-waypoint mapping and the
   // "ends where the track ends" endcap only mean something against the
   // real, full-length track.
+  const rulerSegmentEls: HTMLElement[] = [];
   if (rulerSegmentsEl) {
     for (const waypoint of staged) {
       const segment = document.createElement("div");
       segment.className = "ruler-segment";
       segment.dataset.id = waypoint.id;
-      segment.textContent = unitRegime(waypoint.lookbackYears);
       rulerSegmentsEl.appendChild(segment);
+      rulerSegmentEls.push(segment);
     }
     rulerSegmentsEl.setAttribute("aria-hidden", "true");
   }
@@ -348,6 +349,14 @@ if (track && layersEl) {
     }
 
     const current = currentWaypoint(progress, staged);
+
+    // Segments already scrolled past dim relative to what's ahead, so the
+    // ruler itself reads as a progress cue, not just a static key.
+    const currentIndex = staged.indexOf(current);
+    rulerSegmentEls.forEach((segment, i) => {
+      segment.classList.toggle("past", i < currentIndex);
+      segment.classList.toggle("current", i === currentIndex);
+    });
 
     for (const waypoint of staged) {
       const layer = layerEls.get(waypoint.id);

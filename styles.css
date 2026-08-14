@@ -238,19 +238,39 @@ nav a {
   width: 0.35rem;
   display: flex;
   flex-direction: column;
-  border-radius: 999px;
-  overflow: hidden;
   background: rgb(255 255 255 / 12%);
 }
 
 .ruler-segment {
   flex: 1 1 0%;
+  position: relative;
   border-bottom: 1px solid rgb(255 255 255 / 15%);
-  font-size: 0;
+  background: rgb(255 255 255 / 12%);
+  transition: background-color 0.2s ease;
+}
+
+/* Rounding lives on the end segments themselves rather than a clipping
+   parent, so nothing that legitimately extends outside .ruler-segments'
+   narrow box (e.g. a future label or the input thumb) gets clipped. */
+.ruler-segment:first-child {
+  border-top-left-radius: 999px;
+  border-top-right-radius: 999px;
 }
 
 .ruler-segment:last-child {
   border-bottom: none;
+  border-bottom-left-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+/* Progress dimming: already-scrolled-past segments recede, the current one
+   stands out slightly, everything ahead stays at the baseline above. */
+.ruler-segment.past {
+  background: rgb(255 255 255 / 4%);
+}
+
+.ruler-segment.current {
+  background: rgb(255 255 255 / 26%);
 }
 
 .ruler-endcap {
