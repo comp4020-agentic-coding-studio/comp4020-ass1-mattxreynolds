@@ -1,5 +1,3 @@
-import type { Waypoint } from "./waypoints";
-
 export interface LayerFrame {
   t: number;
   scale: number;
@@ -49,7 +47,10 @@ export function clampProgress(p: number): number {
   return Math.min(Math.max(p, 0), 1);
 }
 
-export function currentWaypoint(progress: number, waypoints: Waypoint[]): Waypoint {
+// Decoupled from the Waypoint type — `from` (a rendering concern, not an
+// intrinsic fact about the object) lives entirely in the generated
+// schedule, so callers pass whatever shape they've merged it into.
+export function currentWaypoint<T extends { from?: number }>(progress: number, waypoints: T[]): T {
   const staged = waypoints.filter((w) => w.from !== undefined);
   let current = staged[0];
   for (const waypoint of staged) {

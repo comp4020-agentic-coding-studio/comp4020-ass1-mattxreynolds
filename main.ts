@@ -11,6 +11,7 @@ import sunImg from "./assets/sun.png";
 import vegaImg from "./assets/vega.png";
 import virgoImg from "./assets/virgo-cluster.png";
 import { progressForRulerFraction, rulerFraction, unitRegime } from "./ruler";
+import { SITE_SCHEDULE } from "./site-schedule";
 import { uniformStarfield } from "./starfield";
 import { WAYPOINTS } from "./waypoints";
 import { clampProgress, currentWaypoint, interpLayer, type LayerFrame, type LayerState } from "./zoom";
@@ -111,12 +112,13 @@ function wireIdentityHover(img: HTMLElement, card: HTMLElement) {
 // LAYER_MARKUP/LAYER_FRAMES machinery as every other waypoint, but each gets
 // a CSS size override (see styles.css): the fog is full-bleed, filling the
 // whole stage rather than sitting as a centred object, and the CMB renders
-// much larger than the default waypoint size. Their LAYER_FRAMES are
-// opacity-only ramps with scale/position held — the fog ramps up, holds,
-// then fades out exactly as the CMB fades in (a synchronised crossfade at
-// t=0.917-0.955), and the CMB then holds at full opacity through the end of
-// the track (interpLayer holds the last keyframe past its t) rather than
-// fading out, so it's still on screen as `.payoff` begins. A separate,
+// much larger than the default waypoint size. Their frames (built in
+// site-schedule.ts, not by the generic generator) are opacity-only ramps
+// with scale/position held — the fog ramps up, holds, then fades out
+// exactly as the CMB fades in (a synchronised crossfade), and the CMB then
+// holds at full opacity through the end of the track (interpLayer holds the
+// last keyframe past its t) rather than fading out, so it's still on screen
+// as `.payoff` begins. A separate,
 // generic starfield backdrop (see STARFIELD_FRAMES) sits behind every layer
 // from the very start and fades out over the fog's own fade-in window.
 const LAYER_MARKUP: Record<string, string> = {
@@ -134,101 +136,20 @@ const LAYER_MARKUP: Record<string, string> = {
   cmb: `<img src="${cmbImg}" alt="The Cosmic Microwave Background" />`,
 };
 
-// {t, scale, x (vw), y (vh), opacity} — t is overall track progress, not
-// local to this layer. x/y offsets are how far the object sits from centre
-// while it's still oversized, before converging to 0,0 as it settles.
-// Sibling-body entrances carry an x/y offset that converges to 0; field
-// reveals (sagittarius-a, virgo-cluster) hold x/y at 0 throughout and only
-// scale down, per PLAN.md's two entrance grammars.
-const LAYER_FRAMES: Record<string, LayerFrame[]> = {
-  moon: [
-    { t: 0, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.073, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  sun: [
-    { t: 0.009, scale: 2.2, x: 50, y: -8, opacity: 0 },
-    { t: 0.037, scale: 2.0, x: 40, y: -6, opacity: 1 },
-    { t: 0.073, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.092, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.156, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  "proxima-centauri": [
-    { t: 0.092, scale: 2.2, x: -50, y: 6, opacity: 0 },
-    { t: 0.119, scale: 2.0, x: -40, y: 5, opacity: 1 },
-    { t: 0.156, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.174, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.238, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  vega: [
-    { t: 0.174, scale: 2.2, x: 50, y: -6, opacity: 0 },
-    { t: 0.202, scale: 2.0, x: 40, y: -5, opacity: 1 },
-    { t: 0.238, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.257, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.339, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  "sagittarius-a": [
-    { t: 0.257, scale: 2.6, x: 0, y: 0, opacity: 0 },
-    { t: 0.293, scale: 2.4, x: 0, y: 0, opacity: 1 },
-    { t: 0.339, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.358, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.422, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  andromeda: [
-    { t: 0.358, scale: 2.2, x: -50, y: 5, opacity: 0 },
-    { t: 0.385, scale: 2.0, x: -40, y: 4, opacity: 1 },
-    { t: 0.422, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.44, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.523, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  "virgo-cluster": [
-    { t: 0.44, scale: 2.6, x: 0, y: 0, opacity: 0 },
-    { t: 0.477, scale: 2.4, x: 0, y: 0, opacity: 1 },
-    { t: 0.523, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.541, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.605, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  "3c273": [
-    { t: 0.541, scale: 2.2, x: 50, y: -6, opacity: 0 },
-    { t: 0.568, scale: 2.0, x: 40, y: -5, opacity: 1 },
-    { t: 0.605, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.623, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.688, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  "gn-z11": [
-    { t: 0.623, scale: 2.2, x: -50, y: 5, opacity: 0 },
-    { t: 0.651, scale: 2.0, x: -40, y: 4, opacity: 1 },
-    { t: 0.688, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.706, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.77, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  "jades-gs-z14-0": [
-    { t: 0.706, scale: 2.2, x: 50, y: -5, opacity: 0 },
-    { t: 0.733, scale: 2.0, x: 40, y: -4, opacity: 1 },
-    { t: 0.77, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.788, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.843, scale: 0.05, x: 0, y: 0, opacity: 0 },
-  ],
-  "reionization-fog": [
-    { t: 0.788, scale: 1, x: 0, y: 0, opacity: 0 },
-    { t: 0.871, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.917, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 0.955, scale: 1, x: 0, y: 0, opacity: 0 },
-  ],
-  cmb: [
-    { t: 0.917, scale: 1, x: 0, y: 0, opacity: 0 },
-    { t: 0.955, scale: 1, x: 0, y: 0, opacity: 1 },
-    { t: 1, scale: 1, x: 0, y: 0, opacity: 1 },
-  ],
-};
+// Keyframes are generated, not hand-picked — see site-schedule.ts for the
+// concrete durations/gaps and schedule.ts for the generator itself. Sibling
+// body entrances carry an x/y offset that converges to 0; field reveals
+// (sagittarius-a, virgo-cluster) hold x/y at 0 throughout and only scale
+// down, per PLAN.md's two entrance grammars.
+const LAYER_FRAMES: Record<string, LayerFrame[]> = SITE_SCHEDULE.schedule.frames;
 
 // A generic starfield backdrop sits behind every waypoint from t=0, then
-// fades out over exactly the reionization fog's own fade-in window
-// (t=0.788 to t=0.871, matching "reionization-fog" above) — the fog is what
-// finally has no stars left showing through it.
+// fades out over exactly the reionization fog's own fade-in window — the
+// fog is what finally has no stars left showing through it.
 const STARFIELD_FRAMES: LayerFrame[] = [
   { t: 0, scale: 1, x: 0, y: 0, opacity: 1 },
-  { t: 0.788, scale: 1, x: 0, y: 0, opacity: 1 },
-  { t: 0.871, scale: 1, x: 0, y: 0, opacity: 0 },
+  { t: SITE_SCHEDULE.starfieldFadeStart, scale: 1, x: 0, y: 0, opacity: 1 },
+  { t: SITE_SCHEDULE.starfieldFadeEnd, scale: 1, x: 0, y: 0, opacity: 0 },
 ];
 
 const track = document.querySelector<HTMLElement>('[data-testid="track"]');
@@ -245,7 +166,16 @@ const rulerSegmentsEl = document.querySelector<HTMLElement>('[data-testid="ruler
 const rulerInput = document.querySelector<HTMLInputElement>('[data-testid="ruler-input"]');
 const calloutsEl = document.querySelector<HTMLElement>('[data-testid="callouts"]');
 
-const staged = WAYPOINTS.filter((w) => w.from !== undefined && LAYER_FRAMES[w.id]);
+// `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint
+// data — it's computed by the schedule generator (see site-schedule.ts) and
+// merged in here, once, at startup.
+const staged = WAYPOINTS.map((waypoint) => ({
+  ...waypoint,
+  from: SITE_SCHEDULE.schedule.from.get(waypoint.id),
+})).filter(
+  (waypoint): waypoint is typeof waypoint & { from: number } =>
+    waypoint.from !== undefined && Boolean(LAYER_FRAMES[waypoint.id]),
+);
 const GATED_IDS = new Set(Object.keys(CARD_OFFSETS));
 
 // Shared by both callout kinds: position a card's static leader-line dog-leg
@@ -273,6 +203,11 @@ if (starfieldEl) {
 }
 
 if (track && layersEl) {
+  // The track's length is a consequence of the schedule (how many
+  // waypoints, how long each phase/gap is), not a number tuned by hand in
+  // CSS — set it here from the one source of truth.
+  track.style.height = `${SITE_SCHEDULE.trackHeightVh}vh`;
+
   const layerEls = new Map<string, HTMLElement>();
   for (const waypoint of staged) {
     const layer = document.createElement("div");
@@ -298,7 +233,7 @@ if (track && layersEl) {
     rulerSegmentsEl.setAttribute("aria-hidden", "true");
   }
 
-  // Diegetic callouts: Moon/Sun only this slice (see CARD_OFFSETS). The
+  // Diegetic callouts: all 10 point-source waypoints (see CARD_OFFSETS). The
   // measurement card's leader-line dog-leg is static local geometry — derived
   // once here from the fixed offset, not recomputed per frame — while the
   // card itself is repositioned every frame in render() via --callout-x/-y to

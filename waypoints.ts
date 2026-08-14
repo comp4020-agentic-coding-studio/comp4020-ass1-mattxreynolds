@@ -12,12 +12,6 @@ export interface Waypoint {
    * CMB are narrative bridges, not discrete objects, so they don't get one.
    */
   whatIsIt?: string;
-  /**
-   * Scroll progress (0-1) within the zoom track at which this waypoint
-   * becomes the current HUD state. Undefined until the waypoint is wired
-   * into the zoom engine — see PLAN.md build order.
-   */
-  from?: number;
 }
 
 // Figures fact-checked 13 Aug 2026 — sources in PLAN.md. Anchor copy is the
@@ -32,7 +26,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackYears: 1.3 / (365.25 * 24 * 3600),
     anchor: "Before you finished reading this sentence.",
     whatIsIt: "Earth's only natural satellite, about a quarter its diameter.",
-    from: 0,
   },
   {
     id: "sun",
@@ -42,7 +35,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackYears: (8.3 * 60) / (365.25 * 24 * 3600),
     anchor: "Long enough to boil an egg.",
     whatIsIt: "A fairly ordinary star. One of roughly 200 billion in the Milky Way.",
-    from: 0.055,
   },
   {
     id: "proxima-centauri",
@@ -52,7 +44,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackYears: 4.2,
     anchor: "About as long as a university degree.",
     whatIsIt: "The nearest star to the Sun — small, faint, and red.",
-    from: 0.138,
   },
   {
     id: "vega",
@@ -62,7 +53,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackYears: 25,
     anchor: "About a generation ago.",
     whatIsIt: "A hot, blue-white star, about twice the Sun's mass.",
-    from: 0.22,
   },
   {
     id: "sagittarius-a",
@@ -72,7 +62,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackYears: 26_000,
     anchor: "The last Ice Age. Woolly mammoths were still common.",
     whatIsIt: "A supermassive black hole, ~4 million times the Sun's mass, at our galaxy's centre.",
-    from: 0.312,
   },
   {
     id: "andromeda",
@@ -82,7 +71,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackYears: 2.5e6,
     anchor: "Around when our own genus, Homo, first appears in the fossil record.",
     whatIsIt: "The nearest large galaxy to ours — over a trillion stars, slowly falling toward us.",
-    from: 0.403,
   },
   {
     id: "virgo-cluster",
@@ -92,7 +80,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackYears: 54e6,
     anchor: "Not long after the dinosaurs died out. Early primates were spreading.",
     whatIsIt: "Over a thousand galaxies bound together — the nearest big cluster to home.",
-    from: 0.495,
   },
   {
     id: "3c273",
@@ -103,7 +90,6 @@ export const WAYPOINTS: Waypoint[] = [
     anchor: "Around when Earth's atmosphere first gained oxygen.",
     whatIsIt:
       "A quasar: a black hole devouring matter so violently it outshines its whole galaxy. The first one ever identified, in 1963.",
-    from: 0.587,
   },
   {
     id: "gn-z11",
@@ -113,7 +99,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackYears: 13.4e9,
     anchor: "Before Earth existed at all.",
     whatIsIt: "One of the most distant galaxies ever confirmed, from a few hundred million years after the Big Bang.",
-    from: 0.669,
   },
   {
     id: "jades-gs-z14-0",
@@ -123,7 +108,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackYears: 13.5e9,
     anchor: "About 300 million years after the Big Bang — before there was an Earth, a Sun, or anything else familiar.",
     whatIsIt: "Currently the most distant galaxy ever confirmed — one of the very first to form.",
-    from: 0.752,
   },
   {
     id: "reionization-fog",
@@ -132,7 +116,6 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "~13.6 billion years ago",
     lookbackYears: 13.6e9,
     anchor: "Not a limit of telescopes. The universe itself was still too foggy to see through.",
-    from: 0.843,
   },
   {
     id: "cmb",
@@ -141,6 +124,5 @@ export const WAYPOINTS: Waypoint[] = [
     lookbackLabel: "13.8 billion years ago",
     lookbackYears: 13.8e9,
     anchor: "There is no anchor older than this. Before this moment, no light existed to see.",
-    from: 0.942,
   },
 ];
