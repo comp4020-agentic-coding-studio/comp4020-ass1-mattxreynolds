@@ -14,7 +14,7 @@ import { progressForRulerFraction, rulerFraction, unitRegime } from "./ruler";
 import { SITE_SCHEDULE } from "./site-schedule";
 import { uniformStarfield } from "./starfield";
 import { WAYPOINTS } from "./waypoints";
-import { clampProgress, currentWaypoint, interpLayer, type LayerFrame, type LayerState } from "./zoom";
+import { clampProgress, currentWaypoint, dampedScale, interpLayer, type LayerFrame, type LayerState } from "./zoom";
 
 // Leader-line anchor offsets (px, from the object's own screen-space centre)
 // for each waypoint's measurement card (name/distance/lookback + gated
@@ -194,6 +194,16 @@ function positionLeaderLine(card: HTMLElement, offset: { x: number; y: number })
     leaderV.style.top = `${Math.min(0, dy)}px`;
     leaderV.style.height = `${Math.abs(dy)}px`;
   }
+  // The card's damped scale (see dampedScale in zoom.ts) needs to shrink
+  // toward the object it's pointing at, not toward its own box centre --
+  // otherwise the leader line's far end drifts off the object as soon as
+  // scale != 1, and the card reads as shrinking in place rather than
+  // receding toward the same vanishing point as its object. Anchoring
+  // transform-origin at the leader line's own endpoint (dx, dy) keeps that
+  // point screen-stationary under scale, since it's mathematically
+  // invariant to the scale factor once translate and transform-origin
+  // share the same point.
+  card.style.transformOrigin = `${dx}px ${dy}px`;
 }
 
 if (starfieldEl) {
@@ -365,6 +375,7 @@ if (track && layersEl) {
         const py = (state.y / 100) * window.innerHeight + offset.y;
         card.style.setProperty("--callout-x", `${px}px`);
         card.style.setProperty("--callout-y", `${py}px`);
+        card.style.setProperty("--callout-scale", String(dampedScale(state.scale)));
       }
     };
     for (const [id, callout] of calloutEls) {

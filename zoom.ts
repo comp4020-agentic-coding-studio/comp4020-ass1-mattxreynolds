@@ -47,6 +47,15 @@ export function clampProgress(p: number): number {
   return Math.min(Math.max(p, 0), 1);
 }
 
+// Maps an object's own oversized/shrunk scale into a much narrower band for
+// its measurement card, anchored at 1 — the card should read as participating
+// in the depth motion (not sitting at fixed size while its object balloons in
+// and recedes to a dot), but stay legible throughout rather than mirroring
+// the object's full range.
+export function dampedScale(scale: number): number {
+  return scale >= 1 ? 1 + (scale - 1) * 0.12 : 1 - (1 - scale) * 0.55;
+}
+
 // Decoupled from the Waypoint type — `from` (a rendering concern, not an
 // intrinsic fact about the object) lives entirely in the generated
 // schedule, so callers pass whatever shape they've merged it into.

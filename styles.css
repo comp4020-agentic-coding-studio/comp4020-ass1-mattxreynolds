@@ -320,7 +320,7 @@ nav a {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(var(--callout-x, 0), var(--callout-y, 0));
+  transform: translate(var(--callout-x, 0), var(--callout-y, 0)) scale(var(--callout-scale, 1));
   max-width: 14rem;
   padding: 0.75rem 1rem;
   background: rgb(5 5 10 / 65%);
