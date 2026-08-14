@@ -124,7 +124,7 @@ const LAYER_MARKUP: Record<string, string> = {
   sun: `<img src="${sunImg}" alt="The Sun" />`,
   "proxima-centauri": `<img src="${proximaImg}" alt="Proxima Centauri" />`,
   vega: `<img src="${vegaImg}" alt="Vega" />`,
-  "sagittarius-a": `<img src="${milkyWayImg}" alt="The Milky Way, seen from its core" />`,
+  "sagittarius-a": `<img src="${milkyWayImg}" alt="The Milky Way's Core" />`,
   andromeda: `<img src="${andromedaImg}" alt="The Andromeda Galaxy" />`,
   "virgo-cluster": `<img src="${virgoImg}" alt="The Virgo Cluster" />`,
   "3c273": `<img src="${q3c273Img}" alt="Quasar 3C 273" />`,
