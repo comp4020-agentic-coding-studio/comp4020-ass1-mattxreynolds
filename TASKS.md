@@ -5,12 +5,13 @@ see `CLAUDE.md`.
 
 ## Next
 
-- [ ] Mobile regression pass: resize mid-scroll, touch-drag ruler thumb,
-  flick-scroll; re-screenshot desktop at fixed progress points to confirm
-  pixel-identical to the pre-mobile-work baseline.
-- [ ] `/ship`, then verify the live URL at both viewports.
+Nothing open — see `FINAL_REVIEW.md` for the last audit pass.
 
 ## Done (collapsed)
+
+- [x] Mobile regression pass (resize mid-scroll, keyboard/tab operability,
+  both viewports) and live-URL verification — repo public, CI/deploy green,
+  confirmed against the deployed URL, not just localhost — `a1c2dd1`.
 
 - [x] `pnpm check:evidence` + linkinator, both green.
 - [x] Filled out `PROCESS.md` (3 cited moments) and
