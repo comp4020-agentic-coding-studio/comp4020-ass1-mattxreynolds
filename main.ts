@@ -175,14 +175,14 @@ const MOBILE_IDENTITY_OFFSETS: Record<string, { x: number; y: number }> = {
   sun: { x: 0, y: -200 },
   "proxima-centauri": { x: 0, y: -200 },
   vega: { x: 0, y: -200 },
-  "sagittarius-a": { x: 0, y: -250 },
-  andromeda: { x: 0, y: -250 },
-  "virgo-cluster": { x: 0, y: -250 },
-  "3c273": { x: 0, y: -250 },
-  "gn-z11": { x: 0, y: -250 },
-  "jades-gs-z14-0": { x: 0, y: -250 },
-  "reionization-fog": { x: 0, y: -250 },
-  cmb: { x: 0, y: -250 },
+  "sagittarius-a": { x: 0, y: -190 },
+  andromeda: { x: 0, y: -190 },
+  "virgo-cluster": { x: 0, y: -190 },
+  "3c273": { x: 0, y: -190 },
+  "gn-z11": { x: 0, y: -190 },
+  "jades-gs-z14-0": { x: 0, y: -190 },
+  "reionization-fog": { x: 0, y: -190 },
+  cmb: { x: 0, y: -220 },
 };
 
 // `from` (each waypoint's HUD/ruler settle point) isn't intrinsic waypoint
